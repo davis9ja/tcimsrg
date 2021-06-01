@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.11)
+
+# set( CMAKE_C_COMPILER "icpc" )
+set( CMAKE_CXX_COMPILER "g++" )
+# set( MPI_C_COMPILER "mpiicpc" )
+# set( MPI_CXX_COMPILER "mpiicpc" )
+# set the project name
+project("Test")
+
+#find_package(taco CONFIG REQUIRED)
+
+# add the executable
+include_directories(/mnt/home/daviso53/taco/include)
+add_executable(main main.cpp)
+target_link_libraries(main /mnt/home/daviso53/taco/build/lib/libtaco.so)
