@@ -1,0 +1,1 @@
+/opt/software/GCCcore/10.3.0/bin/g++ CMakeFiles/main.dir/src/hwrapper.cpp.o CMakeFiles/main.dir/src/main.cpp.o CMakeFiles/main.dir/src/occupation_factors.cpp.o CMakeFiles/main.dir/src/pairinghamiltonian.cpp.o CMakeFiles/main.dir/src/white.cpp.o -o main  -Wl,-rpath,/mnt/home/daviso53/taco/build/lib /mnt/home/daviso53/taco/build/lib/libtaco.so 

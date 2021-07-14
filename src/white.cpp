@@ -1,0 +1,96 @@
+#include "white.hpp"
+#include <stdlib.h>
+#include <math.h>
+
+White::White(int n_holes, int n_particles, Tensor<double> ref) {
+    this->n_holes = n_holes;
+    this->n_particles = n_particles;
+    this->reference = ref;
+
+    this->numStates = n_holes+n_particles;
+
+    Format f1b({Dense,Dense});
+    Format f2b({Dense,Dense,Dense,Dense});
+    Format f3b({Dense,Dense,Dense,Dense,Dense,Dense});
+
+    this->eta1b = Tensor<double>("eta1b", {numStates,numStates}, f1b);
+    this->eta2b = Tensor<double>("eta2b", {numStates,numStates,numStates,numStates}, f2b);
+    //eta3b = Tensor<double>("eta2b", {numStates,numStates,numStates,numStates,numStates,numStates}, f3b);
+}
+
+int sgn(double x) {
+    return (x > 0) ? 1 : ((x < 0) ? -1 : 0);
+}
+
+Tensor<double> White::compute_1b(Tensor<double> f, Tensor<double> Gamma, Tensor<double> W) {
+    
+    double nbara, ni, nbara_sq, ni_sq;
+    double denom, result;
+    for (int a = 0; a < numStates; a++) {
+        for (int i = 0; i < numStates; i++) {
+
+            nbara = 1 - reference(a);
+            ni = reference(i);
+            nbara_sq = nbara*nbara;
+            ni_sq = ni*ni;
+            denom = f(a,a)*nbara_sq - f(i,i)*ni_sq + Gamma(a,i,a,i)*nbara_sq*ni_sq;
+
+            if ( abs(denom) < 1e-10 ) 
+                result = 0.25 * M_PI * sgn(f(a,i)*nbara*ni) * sgn(denom);
+            else
+                result = f(a,i) * nbara*ni / denom;
+
+            eta1b.insert({a,i}, result);
+            eta1b.insert({i,a}, -result);
+            
+        }
+    }
+        
+    return eta1b;
+}
+
+Tensor<double> White::compute_2b(Tensor<double> f, Tensor<double> Gamma, Tensor<double> W) {
+    
+    double nbara, nbarb, ni, nj, nbara_sq, nbarb_sq, ni_sq, nj_sq;
+    double denom, result;
+    for (int a = 0; a < numStates; a++) {
+        for (int b = 0; b < numStates; b++) {
+            for (int i = 0; i < numStates; i++) {
+                for (int j = 0; j < numStates; j++) { 
+                
+                    nbara = 1 - reference(a);
+                    nbarb = 1 - reference(b);                   
+                    ni = reference(i);
+                    nj = reference(j);
+                    nbara_sq = nbara*nbara;
+                    nbarb_sq = nbarb*nbarb;
+                    ni_sq = ni*ni;
+                    nj_sq = nj*nj;
+
+
+                    denom = f(a,a)*nbara_sq + f(b,b)*nbarb_sq - f(i,i)*ni_sq - f(j,j)*nj_sq \
+                        + Gamma(a,b,a,b)*nbara_sq*nbarb_sq + Gamma(i,j,i,j)*ni_sq*nj_sq \
+                        - Gamma(a,i,a,i)*nbara_sq*ni_sq - Gamma(b,j,b,j)*nbarb_sq*nj_sq \
+                        - Gamma(a,j,a,j)*nbara_sq*nj_sq - Gamma(b,i,b,i)*nbarb_sq*ni_sq;
+                    
+                    if ( abs(denom) < 1e-10 ) 
+                        result = 0.25 * M_PI * sgn(Gamma(a,b,i,j)*nbarb*nbara*ni*nj) * sgn(denom);
+                    else
+                        result = Gamma(a,b,i,j)*nbarb*nbara*ni*nj / denom;
+
+                    eta2b.insert({a,b,i,j}, result);
+                    eta2b.insert({i,j,a,b}, -result);
+                }
+            }            
+        }
+    }
+        
+    return eta2b;
+
+}
+
+Tensor<double> White::compute_3b(Tensor<double> f, Tensor<double> Gamma, Tensor<double> W) {
+    
+    return W;
+}
+

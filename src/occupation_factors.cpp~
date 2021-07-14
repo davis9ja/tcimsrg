@@ -1,0 +1,135 @@
+#include "occupation_factors.hpp"
+#include <sys/stat.h>
+#include <sys/types.h>
+
+using namespace taco;
+using namespace std;
+
+OccupationFactors::OccupationFactors(int n_holes, int n_particles, Tensor<double> ref)
+{
+    this->n_holes = n_holes;
+    this->n_particles = n_particles;
+    this->ref = ref;
+
+    const char* path_char = &path[0];
+    int check = mkdir(path_char, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+
+    if (check == -1) {
+        printf("Occ factor files probably exist -- not writing to file\n");
+        return;
+    }
+
+    writeA();
+    writeB();
+    //writeC();
+    writeD();
+}
+
+
+void OccupationFactors::writeA() {
+    int numStates = n_holes+n_particles;
+
+    Tensor<double> occA_a({numStates,2}, Format({Dense,Dense}));
+    Tensor<double> occA_b({2,numStates}, Format({Dense,Dense}));
+
+    for (int a = 0; a < numStates; a++) {
+        double val = ref(a);
+        occA_a.insert({a,0}, val);
+        occA_a.insert({a,1}, 1.0);
+
+        occA_b.insert({0,a}, 1.0);
+        occA_b.insert({1,a}, -val);
+    }
+
+    occA_a.pack();
+    occA_b.pack();
+
+    write(path+"occA_a.tns", occA_a);
+    write(path+"occA_b.tns", occA_b);
+
+}
+
+void OccupationFactors::writeB() {
+    int numStates = n_holes+n_particles;
+
+    Tensor<double> occB_a({numStates,2}, Format({Dense,Dense}));
+    Tensor<double> occB_b({2,numStates}, Format({Dense,Dense}));
+
+    for (int a = 0; a < numStates; a++) {
+        double val = ref(a);
+        occB_a.insert({a,0}, 1-val);
+        occB_a.insert({a,1}, 1.0);
+        
+        occB_b.insert({0,a}, 1.0);
+        occB_b.insert({1,a}, -val);
+    }
+
+    occB_a.pack();
+    occB_b.pack();
+       
+    write(path+"occB_a.tns", occB_a);
+    write(path+"occB_b.tns", occB_b);    
+}
+
+void OccupationFactors::writeC() {
+    int numStates = n_holes+n_particles;
+
+    Tensor<double> occC_a({numStates,4}, Format({Dense,Dense}));
+    Tensor<double> occC_b({4,numStates,4}, Format({Dense,Dense,Dense}));
+    Tensor<double> occC_c({4, numStates}, Format({Dense,Dense,Dense}));
+
+    for (int a = 0; a < numStates; a++) {
+        double val = ref(a);
+        occC_a.insert({a,0}, val);
+        occC_a.insert({a,1}, 1.0);
+        occC_a.insert({a,2}, 1.0);
+        occC_a.insert({a,3}, val);
+
+        occC_b.insert({0,a,0}, val);
+        occC_b.insert({1,a,1}, 1.0);
+        occC_b.insert({2,a,2}, -val);
+        occC_b.insert({3,a,3}, 1.0);
+
+        occC_c.insert({0,a}, 1.0);
+        occC_c.insert({1,a}, val);
+        occC_c.insert({2,a}, val);
+        occC_c.insert({3,a}, val);        
+    }
+
+    occC_a.pack();
+    occC_b.pack();
+    occC_c.pack();
+
+    write(path+"occC_a.tns", occC_a);
+    write(path+"occC_b.tns", occC_b);
+    write(path+"occC_c.tns", occC_c);    
+}
+
+void OccupationFactors::writeD() {
+    int numStates = n_holes+n_particles;
+
+    Tensor<double> occD_a({numStates,2}, Format({Dense,Dense}));
+    Tensor<double> occD_b({2,numStates}, Format({Dense,Dense}));
+    Tensor<double> occD_c({numStates,2}, Format({Dense,Dense}));
+    Tensor<double> occD_d({2,numStates}, Format({Dense,Dense}));
+
+    for (int a = 0; a < numStates; a++) {
+        double val = ref(a);
+
+        occD_a.insert({a,0}, val);
+        occD_b.insert({0,a}, val);
+        occD_c.insert({a,0}, 1-val);
+        occD_d.insert({0,a}, 1-val);
+    }
+
+    occD_a.pack();
+    occD_b.pack();
+    occD_c.pack();
+    occD_d.pack();
+
+    write(path+"occD_a.tns", occD_a);
+    write(path+"occD_b.tns", occD_b);
+    write(path+"occD_c.tns", occD_c);
+    write(path+"occD_d.tns", occD_d);        
+}
+
