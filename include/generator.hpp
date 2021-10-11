@@ -1,27 +1,24 @@
-#include "taco.h"
+#ifndef GENERATOR_HPP_
+#define GENERATOR_HPP_
 
-using namespace taco;
+//#include "taco.h"
+#include <boost/numeric/ublas/vector.hpp>
+//using namespace taco;
 
 class Generator {
 
 public:
-    Tensor<double> eta1b;
-    Tensor<double> eta2b;
-    Tensor<double> eta3b;
+    boost::numeric::ublas::vector<double> eta1b;
+    boost::numeric::ublas::vector<double> eta2b;
+    boost::numeric::ublas::vector<double> eta3b;
     
     int n_holes;
     int n_particles;
 
-    virtual Tensor<double> compute_1b(Tensor<double> E, Tensor<double> f, Tensor<double> Gamma) = 0;
-    virtual Tensor<double> compute_2b(Tensor<double> E, Tensor<double> f, Tensor<double> Gamma) = 0;
-    virtual Tensor<double> compute_3b(Tensor<double> E, Tensor<double> f, Tensor<double> Gamma) = 0;
+    virtual boost::numeric::ublas::vector<double> compute_1b(boost::numeric::ublas::vector<double> E, boost::numeric::ublas::vector<double> f, boost::numeric::ublas::vector<double> Gamma) = 0;
+    virtual boost::numeric::ublas::vector<double> compute_2b(boost::numeric::ublas::vector<double> E, boost::numeric::ublas::vector<double> f, boost::numeric::ublas::vector<double> Gamma) = 0;
+    virtual boost::numeric::ublas::vector<double> compute_3b(boost::numeric::ublas::vector<double> E, boost::numeric::ublas::vector<double> f, boost::numeric::ublas::vector<double> Gamma) = 0;
 
 };
 
-
-
-
-
-
-
-
+#endif

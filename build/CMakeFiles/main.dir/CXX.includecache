@@ -6,17 +6,49 @@
 
 #IncludeRegexTransform: 
 
+../include/flow_imsrg2.hpp
+boost/numeric/ublas/vector.hpp
+-
+math.h
+-
+taco.h
+../include/taco.h
+occupation_factors.hpp
+../include/occupation_factors.hpp
+
 ../include/generator.hpp
+boost/numeric/ublas/vector.hpp
+-
+
+../include/occupation_factors.hpp
+boost/numeric/ublas/vector.hpp
+-
 taco.h
 ../include/taco.h
 
+../include/system.hpp
+boost/numeric/ublas/vector.hpp
+-
+math.h
+-
+omp.h
+-
+taco.h
+../include/taco.h
+white.hpp
 ../include/white.hpp
+flow_imsrg2.hpp
+../include/flow_imsrg2.hpp
+
+../include/white.hpp
+taco.h
+../include/taco.h
 generator.hpp
 ../include/generator.hpp
 
-/mnt/home/daviso53/Research/tcimsrg/src/white.cpp
-white.hpp
-/mnt/home/daviso53/Research/tcimsrg/src/white.hpp
+/mnt/home/daviso53/Research/tcimsrg/src/system.cpp
+system.hpp
+/mnt/home/daviso53/Research/tcimsrg/src/system.hpp
 
 /mnt/home/daviso53/taco/include/taco.h
 taco/tensor.h

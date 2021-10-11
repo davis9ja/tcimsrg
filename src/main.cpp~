@@ -1,19 +1,24 @@
 #include <stdio.h>
 #include <ctime>
+#include <boost/numeric/odeint.hpp>
 
 #include "taco.h"
 #include "pairinghamiltonian.hpp"
 #include "occupation_factors.hpp"
 #include "white.hpp"
+#include "flow_imsrg2.hpp"
+#include "derivative.hpp"
 
 using namespace taco;
+using namespace boost::numeric::odeint;
+using namespace std;
 
 int main() {
     int nholes = 4;
     int nparticles = 4;
     double d = 1.0;
     double g = 0.5;
-    double pb = 0.0;
+    double pb = 0.1;
 
     int numStates = nholes + nparticles;
     Tensor<double> ref("reference", {numStates}, Format(Dense));
@@ -30,29 +35,67 @@ int main() {
     White* white = new White(nholes, nparticles, ref);
     OccupationFactors* occ = new OccupationFactors(nholes, nparticles, ref);
     PairingHamiltonian* H = new PairingHamiltonian(nholes, nparticles, ref, d,g,pb);
+    Flow_IMSRG2* flow = new Flow_IMSRG2(occ);
 
-    double E = H->get_E();//taco::Tensor<double> E = H->get_E();
-    taco::Tensor<double> f = H->get_f();
-    taco::Tensor<double> Gamma = H->get_Gamma();
-    taco::Tensor<double> W;
-    
-    std::time_t ti = std::clock();
+    Tensor<double> E = H->get_E();
+    Tensor<double> f = H->get_f();
+    Tensor<double> Gamma = H->get_Gamma();
+    Tensor<double> W;
+
+    time_t ti, tf;
+
+    ti = clock();
     Tensor<double> eta1b = white->compute_1b(f, Gamma, W);
-    std::time_t tf = std::clock();
-    printf("%.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
+    tf = clock();
+    printf("calculate eta1b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
 
-    std::time_t ti = std::clock();
+    ti = clock();
     Tensor<double> eta2b = white->compute_2b(f, Gamma, W);
-    std::time_t tf = std::clock();
-    printf("%.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
+    tf = clock();
+    printf("calculate eta2b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
 
-    std::cout << eta1b << std::endl;
-    std::cout << eta2b << std::endl;
-    //taco::Tensor<double> ref = H->getReference();
+    ti = clock();
+    Tensor<double> flow_0b = flow->flow_0b(f, Gamma, eta1b, eta2b);
+    tf = clock();
+    printf("calculate flow_0b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
 
-    //std::cout << E << std::endl;
+    ti = clock();
+    Tensor<double> flow_1b = flow->flow_1b(f, Gamma, eta1b, eta2b);
+    tf = clock();
+    printf("calculate flow_1b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
+
+    ti = clock();
+    Tensor<double> flow_2b = flow->flow_2b(f, Gamma, eta1b, eta2b);
+    tf = clock();
+    printf("calculate flow_2b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
+
+    cout << flow_0b << endl;
+    cout << flow_1b << endl;
+    //Tensor<double> ref = H->getReference();
+
+    cout << E << endl;
     //std::cout << ref << std::endl;
+
+    container c;
+    c.E = E;
+    c.f = f;
+    c.Gamma = Gamma;
+    c.W = W;
+    c.generator = white;
+    c.flow = flow;
+
+    container dcdt;
+    double t = 1.0;
+    derivative(c, dcdt, t);
     
+    Tensor<double> result;
+    result() = c.E() + dcdt.E();
+    cout << result << endl;
+
+    // size_t steps = integrate(derivative, c, 0.0, 10.0, 0.1);
+    // cout << c.E << endl;
+    // cout << steps << endl;
+
     delete H;
     delete occ;
     delete white;

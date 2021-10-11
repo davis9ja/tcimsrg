@@ -4,8 +4,8 @@
 #include <stdio.h>
 
 using namespace taco;
-
-PairingHamiltonian::PairingHamiltonian(int n_holes, int n_particles, Tensor<double> ref, double d, double g, double pb) 
+using namespace boost::numeric::ublas;
+PairingHamiltonian::PairingHamiltonian(int n_holes, int n_particles, vector<double> ref, double d, double g, double pb) 
 {
     this->d = d;
     this->g = g;
@@ -22,21 +22,24 @@ PairingHamiltonian::PairingHamiltonian(int n_holes, int n_particles, Tensor<doub
     
     
     // Declare H1B
-    H1B = Tensor<double>("H1B", 
-        {numStates, numStates}, 
-        Format({Dense,Dense})
-        );
+    // H1B = Tensor<double>("H1B", 
+    //     {numStates, numStates}, 
+    //     Format({Dense,Dense})
+    //     );
+
+    H1B = vector<double>(numStates*numStates);
     
     // Delcare H2B
-    H2B = Tensor<double>("H2B", 
-        {numStates, numStates, numStates, numStates}, 
-        Format({Dense,Dense,Dense,Dense})
-        );
+    // H2B = Tensor<double>("H2B", 
+    //     {numStates, numStates, numStates, numStates}, 
+    //     Format({Dense,Dense,Dense,Dense})
+    //     );
+    H2B = vector<double>(numStates*numStates*numStates*numStates);
 
     // Fill hole and particle index containers
     double ref_i;
     for (int i = 0; i < n_holes; i++) {
-        ref_i = ref(i);
+        ref_i = ref[i];
 
         if (ref_i >= 0.5)
             holes[i] = i;
@@ -45,81 +48,107 @@ PairingHamiltonian::PairingHamiltonian(int n_holes, int n_particles, Tensor<doub
 
     // Construct the vacuum Hamiltonian and fill spBasis
     double occupation = 1.0;
+    int idx1b, idx2b;
     for (int p = 0; p < numStates; p++) {
         
         spBasis[p] = p;
 
-        H1B.insert({p,p}, this->d*(int)(p/2));
+        //H1B.insert({p,p}, this->d*(int)(p/2));
+        idx1b = p*numStates + p;
+        H1B[idx1b] = this->d*(int)(p/2);
 
         for (int q = 0; q < numStates; q++) {
             for (int r = 0; r < numStates; r++) {
                 for (int s = 0; s < numStates; s++) {
-                    H2B.insert({p,q,r,s}, this->g*0.5*this->delta2B(p,q,r,s));
-                    H2B.insert({p,q,r,s}, this->pb*0.5*this->deltaPB(p,q,r,s));
+                    // H2B.insert({p,q,r,s}, this->g*0.5*this->delta2B(p,q,r,s));
+                    // H2B.insert({p,q,r,s}, this->pb*0.5*this->deltaPB(p,q,r,s));
+                    
+                    idx2b = p*numStates*numStates*numStates + q*numStates*numStates + r*numStates + s;
+                    H2B[idx2b] += this->g*0.5*this->delta2B(p,q,r,s);
+                    H2B[idx2b] += this->pb*0.5*this->deltaPB(p,q,r,s);
 
+                    // if (H2B[idx2b] != 0)
+                    //     printf("%d%d%d%d, %0.2f\n", p,q,r,s, H2B[idx2b]);
                 }
             }
         }
     }
 
     //ref.pack();
-    H1B.pack();
-    H2B.pack();
+    //H1B.pack();
+    //H2B.pack();
 
     // Declare IM-SRG normal-ordered operator coefficients
     
     // One body
-    f = Tensor<double>("f", 
-        {numStates,numStates},
-        Format({Dense,Dense})
-        );
+    // f = Tensor<double>("f", 
+    //     {numStates,numStates},
+    //     Format({Dense,Dense})
+    //     );
+    f = vector<double>(numStates*numStates);
 
     // Two body
-    Gamma = H2B; // IM-SRG(2) truncation
+    Gamma = vector<double>(H2B.size());
+    for (int i = 0; i < Gamma.size(); i++)
+        Gamma[i] = H2B[i]; // IM-SRG(2) truncation
 
     // Normal order the Hamiltonian with respect to the reference
     // CANNOT use TACO to trace over indices of same tensor (why not?)
 
-    Tensor<double> Gamma_piqi("Gamma_piqi", {numStates, numStates}, {Dense, Dense});
+    //Tensor<double> Gamma_piqi("Gamma_piqi", {numStates, numStates}, {Dense, Dense});
+    vector<double> Gamma_piqi(numStates*numStates);
 
+    int idxGamma, idxf;
     // double Gamma_val = 0.0;
     // double ref_val = 0.0;
     for (int p = 0; p < numStates; p++) {
         for (int q = 0; q < numStates; q++) {
             double sum = 0.0;
             for (int i = 0; i < numStates; i++) {
-                sum += Gamma(p,i,q,i)*ref(i);
+                idxGamma = p*numStates*numStates*numStates + i*numStates*numStates + q*numStates + i;
+
+                sum += Gamma[idxGamma]*ref[i];
             }
-            Gamma_piqi.insert({p,q}, sum);
+            //Gamma_piqi.insert({p,q}, sum);
+            //Gamma_piqi[p,q] += sum;
+            idxf = p*numStates+q;
+            f[idxf] += H1B[idxf] + sum;
         }
     }
 
-    Gamma_piqi.pack();
+    //Gamma_piqi.pack();
 
     // Gamma_piqi.compile();
     // Gamma_piqi.assemble();
     // Gamma_piqi.compute();
-    IndexVar p,q;
-    f(p,q) = H1B(p,q) + Gamma_piqi(p,q);
-    f.compile();
-    f.assemble();
-    f.compute();
+
+    // IndexVar p,q;
+    // f(p,q) = H1B(p,q) + Gamma_piqi(p,q);
+    // f.evaluate();
+
 
     // Computing E zero body
     // Need to trace over 1B and 2B operators
     
     //One body trace
     double h1b_ii = 0.0;
-    for (int i = 0; i < numStates; i++)
-        h1b_ii += H1B(i,i)*ref(i);
+    for (int i = 0; i < numStates; i++) {
+        h1b_ii += H1B[i*numStates+i]*ref[i];     
+    }
 
     double Gamma_ijij = 0.0;
-    for (int i = 0; i < numStates; i++)
-        for (int j = 0; j < numStates; j++)
-            Gamma_ijij += Gamma(i,j,i,j)*ref(i)*ref(j);
-
+    for (int i = 0; i < numStates; i++) {
+        for (int j = 0; j < numStates; j++) {
+            idxGamma = i*numStates*numStates*numStates + j*numStates*numStates + i*numStates + j;
+            Gamma_ijij += Gamma[idxGamma]*ref[i]*ref[j];
+        }
+    }
+    //std::cout << "Gamma_ijij, " << Gamma_ijij << std::endl;
     
     E = h1b_ii + 0.5*Gamma_ijij;//double E_val = h1b_ii + 0.5*Gamma_ijij;
+
+    // E = Tensor<double>(E_val);
+    // E.pack();
 
     // Tensor<double> E(E_val);
     // E.pack();

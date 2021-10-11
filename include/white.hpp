@@ -1,21 +1,23 @@
-#ifndef GENERATOR_HPP_
-#define GENERATOR_HPP_
+#ifndef WHITE_HPP_
+#define WHITE_HPP_
 
+#include "taco.h"
 #include "generator.hpp"
-using namespace taco;
+//using namespace taco;
 
 class White: public Generator {
 
 private:
-    int n_holes, n_particles, numStates;
-    Tensor<double> eta1b, eta2b, reference;
+    int numStates;
+    boost::numeric::ublas::vector<double> reference;
+    //taco::Format f1b, f2b, f3b;
 
 public:
-    White(int n_holes, int n_particles, Tensor<double> reference);
+    White(int n_holes, int n_particles, boost::numeric::ublas::vector<double> reference);
 
-    Tensor<double> compute_1b(Tensor<double> f, Tensor<double> Gamma, Tensor<double> W);
-    Tensor<double> compute_2b(Tensor<double> f, Tensor<double> Gamma, Tensor<double> W);
-    Tensor<double> compute_3b(Tensor<double> f, Tensor<double> Gamma, Tensor<double> W);
+    boost::numeric::ublas::vector<double> compute_1b(boost::numeric::ublas::vector<double> f, boost::numeric::ublas::vector<double> Gamma, boost::numeric::ublas::vector<double> W);
+    boost::numeric::ublas::vector<double> compute_2b(boost::numeric::ublas::vector<double> f, boost::numeric::ublas::vector<double> Gamma, boost::numeric::ublas::vector<double> W);
+    boost::numeric::ublas::vector<double> compute_3b(boost::numeric::ublas::vector<double> f, boost::numeric::ublas::vector<double> Gamma, boost::numeric::ublas::vector<double> W);
 
 };
 

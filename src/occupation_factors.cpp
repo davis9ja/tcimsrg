@@ -3,9 +3,9 @@
 #include <sys/types.h>
 
 using namespace taco;
-using namespace std;
+using namespace boost::numeric::ublas;
 
-OccupationFactors::OccupationFactors(int n_holes, int n_particles, Tensor<double> ref)
+OccupationFactors::OccupationFactors(int n_holes, int n_particles, vector<double> ref)
 {
     this->n_holes = n_holes;
     this->n_particles = n_particles;
@@ -21,10 +21,13 @@ OccupationFactors::OccupationFactors(int n_holes, int n_particles, Tensor<double
 
     writeA();
     writeB();
-    //writeC();
+    writeC();
     writeD();
 }
 
+std::string OccupationFactors::getPath() {
+    return path;
+}
 
 void OccupationFactors::writeA() {
     int numStates = n_holes+n_particles;
@@ -33,7 +36,7 @@ void OccupationFactors::writeA() {
     Tensor<double> occA_b({2,numStates}, Format({Dense,Dense}));
 
     for (int a = 0; a < numStates; a++) {
-        double val = ref(a);
+        double val = ref[a];
         occA_a.insert({a,0}, val);
         occA_a.insert({a,1}, 1.0);
 
@@ -56,7 +59,7 @@ void OccupationFactors::writeB() {
     Tensor<double> occB_b({2,numStates}, Format({Dense,Dense}));
 
     for (int a = 0; a < numStates; a++) {
-        double val = ref(a);
+        double val = ref[a];
         occB_a.insert({a,0}, 1-val);
         occB_a.insert({a,1}, 1.0);
         
@@ -79,7 +82,7 @@ void OccupationFactors::writeC() {
     Tensor<double> occC_c({4, numStates}, Format({Dense,Dense}));
 
     for (int a = 0; a < numStates; a++) {
-        double val = ref(a);
+        double val = ref[a];
         occC_a.insert({a,0}, val);
         occC_a.insert({a,1}, 1.0);
         occC_a.insert({a,2}, 1.0);
@@ -114,7 +117,7 @@ void OccupationFactors::writeD() {
     Tensor<double> occD_d({2,numStates}, Format({Dense,Dense}));
 
     for (int a = 0; a < numStates; a++) {
-        double val = ref(a);
+        double val = ref[a];
 
         occD_a.insert({a,0}, val);
         occD_b.insert({0,a}, val);
