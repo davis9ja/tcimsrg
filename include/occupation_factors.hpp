@@ -27,6 +27,15 @@ public:
     //~OccupationFactors();
 
     int getNumStates() { return n_holes+n_particles; }
+
+    void readOccTensors(std::string factor_path,
+                    taco::Tensor<double> &occA_a, taco::Tensor<double> &occA_b, 
+                    taco::Tensor<double> &occB_a, taco::Tensor<double> &occB_b,
+                    taco::Tensor<double> &occC_a, taco::Tensor<double> &occC_b, 
+                    taco::Tensor<double> &occC_c,
+                    taco::Tensor<double> &occD_a, taco::Tensor<double> &occD_b,
+                    taco::Tensor<double> &occD_c, taco::Tensor<double> &occD_d);
+
 };
 
 

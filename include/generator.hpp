@@ -15,9 +15,9 @@ public:
     int n_holes;
     int n_particles;
 
-    virtual boost::numeric::ublas::vector<double> compute_1b(boost::numeric::ublas::vector<double> E, boost::numeric::ublas::vector<double> f, boost::numeric::ublas::vector<double> Gamma) = 0;
-    virtual boost::numeric::ublas::vector<double> compute_2b(boost::numeric::ublas::vector<double> E, boost::numeric::ublas::vector<double> f, boost::numeric::ublas::vector<double> Gamma) = 0;
-    virtual boost::numeric::ublas::vector<double> compute_3b(boost::numeric::ublas::vector<double> E, boost::numeric::ublas::vector<double> f, boost::numeric::ublas::vector<double> Gamma) = 0;
+    virtual boost::numeric::ublas::vector<double> compute_1b(boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W) = 0;
+    virtual boost::numeric::ublas::vector<double> compute_2b(boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W) = 0;
+    virtual boost::numeric::ublas::vector<double> compute_3b(boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W) = 0;
 
 };
 

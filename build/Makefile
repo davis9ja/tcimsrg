@@ -143,6 +143,33 @@ main/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
+src/BACKEND_ublas.o: src/BACKEND_ublas.cpp.o
+
+.PHONY : src/BACKEND_ublas.o
+
+# target to build an object file
+src/BACKEND_ublas.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/BACKEND_ublas.cpp.o
+.PHONY : src/BACKEND_ublas.cpp.o
+
+src/BACKEND_ublas.i: src/BACKEND_ublas.cpp.i
+
+.PHONY : src/BACKEND_ublas.i
+
+# target to preprocess a source file
+src/BACKEND_ublas.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/BACKEND_ublas.cpp.i
+.PHONY : src/BACKEND_ublas.cpp.i
+
+src/BACKEND_ublas.s: src/BACKEND_ublas.cpp.s
+
+.PHONY : src/BACKEND_ublas.s
+
+# target to generate assembly for a file
+src/BACKEND_ublas.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/BACKEND_ublas.cpp.s
+.PHONY : src/BACKEND_ublas.cpp.s
+
 src/derivative.o: src/derivative.cpp.o
 
 .PHONY : src/derivative.o
@@ -223,6 +250,33 @@ src/hwrapper.s: src/hwrapper.cpp.s
 src/hwrapper.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/hwrapper.cpp.s
 .PHONY : src/hwrapper.cpp.s
+
+src/imsrg_utils.o: src/imsrg_utils.cpp.o
+
+.PHONY : src/imsrg_utils.o
+
+# target to build an object file
+src/imsrg_utils.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/imsrg_utils.cpp.o
+.PHONY : src/imsrg_utils.cpp.o
+
+src/imsrg_utils.i: src/imsrg_utils.cpp.i
+
+.PHONY : src/imsrg_utils.i
+
+# target to preprocess a source file
+src/imsrg_utils.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/imsrg_utils.cpp.i
+.PHONY : src/imsrg_utils.cpp.i
+
+src/imsrg_utils.s: src/imsrg_utils.cpp.s
+
+.PHONY : src/imsrg_utils.s
+
+# target to generate assembly for a file
+src/imsrg_utils.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/imsrg_utils.cpp.s
+.PHONY : src/imsrg_utils.cpp.s
 
 src/main.o: src/main.cpp.o
 
@@ -368,6 +422,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... main"
+	@echo "... src/BACKEND_ublas.o"
+	@echo "... src/BACKEND_ublas.i"
+	@echo "... src/BACKEND_ublas.s"
 	@echo "... src/derivative.o"
 	@echo "... src/derivative.i"
 	@echo "... src/derivative.s"
@@ -377,6 +434,9 @@ help:
 	@echo "... src/hwrapper.o"
 	@echo "... src/hwrapper.i"
 	@echo "... src/hwrapper.s"
+	@echo "... src/imsrg_utils.o"
+	@echo "... src/imsrg_utils.i"
+	@echo "... src/imsrg_utils.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

@@ -28,13 +28,18 @@ PairingHamiltonian::PairingHamiltonian(int n_holes, int n_particles, vector<doub
     //     );
 
     H1B = vector<double>(numStates*numStates);
-    
+    for (int i = 0; i < H1B.size(); i++)
+        H1B[i] = 0.;
+
     // Delcare H2B
     // H2B = Tensor<double>("H2B", 
     //     {numStates, numStates, numStates, numStates}, 
     //     Format({Dense,Dense,Dense,Dense})
     //     );
+
     H2B = vector<double>(numStates*numStates*numStates*numStates);
+    for (int i = 0; i < H2B.size(); i++)
+        H2B[i] = 0.;
 
     // Fill hole and particle index containers
     double ref_i;
@@ -86,6 +91,8 @@ PairingHamiltonian::PairingHamiltonian(int n_holes, int n_particles, vector<doub
     //     Format({Dense,Dense})
     //     );
     f = vector<double>(numStates*numStates);
+    for(int i = 0; i < f.size(); i++)
+        f[i] = 0.;
 
     // Two body
     Gamma = vector<double>(H2B.size());

@@ -5,7 +5,7 @@
 
 using namespace boost::numeric::ublas;
 
-White::White(int n_holes, int n_particles, vector<double> ref) {
+White::White(int n_holes, int n_particles, vector<double> &ref) {
     this->n_holes = n_holes;
     this->n_particles = n_particles;
     this->reference = ref;
@@ -25,7 +25,7 @@ int sgn(double x) {
     return (x > 0) ? 1 : ((x < 0) ? -1 : 0);
 }
 
-vector<double> White::compute_1b(vector<double> f, vector<double> Gamma, vector<double> W) {
+vector<double> White::compute_1b(vector<double> &f, vector<double> &Gamma, vector<double> &W) {
 
     // vector<double> eta1b_tensor("eta1b", {numStates,numStates}, f1b);
     // eta1b_tensor.pack();
@@ -58,9 +58,9 @@ vector<double> White::compute_1b(vector<double> f, vector<double> Gamma, vector<
             else
                 result = f[idxai] * nbara*ni / denom;
             
-            // if (result > 100) {
-            //     std::cout << a << i << " " << idxai << " " << result << " DENOM " << denom << " f[idxai]*nbara*ni " << f[idxai] << std::endl;
-            // }
+            if (result > 100) {
+                std::cout << a << " " << i << " " << idxai << " " << result << " DENOM " << denom << " f[idxai]*nbara*ni " << f[idxai] << std::endl;
+            }
 
             //std::cout << a << "," << i << " " << result << std::endl;
             //std::cout << result << std::endl;
@@ -89,7 +89,7 @@ vector<double> White::compute_1b(vector<double> f, vector<double> Gamma, vector<
     return eta1b_arr;
 }
 
-vector<double> White::compute_2b(vector<double> f, vector<double> Gamma, vector<double> W) {
+vector<double> White::compute_2b(vector<double> &f, vector<double> &Gamma, vector<double> &W) {
 
     // vector<double> eta2b_tensor("eta2b", {numStates,numStates,numStates,numStates}, f2b);
     // eta2b_tensor.pack();
@@ -171,7 +171,7 @@ vector<double> White::compute_2b(vector<double> f, vector<double> Gamma, vector<
 
 }
 
-vector<double> White::compute_3b(vector<double> f, vector<double> Gamma, vector<double> W) {
+vector<double> White::compute_3b(vector<double> &f, vector<double> &Gamma, vector<double> &W) {
     
     return W;
 }

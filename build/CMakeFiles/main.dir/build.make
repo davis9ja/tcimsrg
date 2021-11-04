@@ -77,9 +77,22 @@ include CMakeFiles/main.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/main.dir/flags.make
 
+CMakeFiles/main.dir/src/BACKEND_ublas.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/BACKEND_ublas.cpp.o: ../src/BACKEND_ublas.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/main.dir/src/BACKEND_ublas.cpp.o"
+	/opt/software/GCCcore/6.4.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/BACKEND_ublas.cpp.o -c /mnt/home/daviso53/Research/tcimsrg/src/BACKEND_ublas.cpp
+
+CMakeFiles/main.dir/src/BACKEND_ublas.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/BACKEND_ublas.cpp.i"
+	/opt/software/GCCcore/6.4.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/home/daviso53/Research/tcimsrg/src/BACKEND_ublas.cpp > CMakeFiles/main.dir/src/BACKEND_ublas.cpp.i
+
+CMakeFiles/main.dir/src/BACKEND_ublas.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/BACKEND_ublas.cpp.s"
+	/opt/software/GCCcore/6.4.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/home/daviso53/Research/tcimsrg/src/BACKEND_ublas.cpp -o CMakeFiles/main.dir/src/BACKEND_ublas.cpp.s
+
 CMakeFiles/main.dir/src/derivative.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/derivative.cpp.o: ../src/derivative.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/main.dir/src/derivative.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/src/derivative.cpp.o"
 	/opt/software/GCCcore/6.4.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/derivative.cpp.o -c /mnt/home/daviso53/Research/tcimsrg/src/derivative.cpp
 
 CMakeFiles/main.dir/src/derivative.cpp.i: cmake_force
@@ -92,7 +105,7 @@ CMakeFiles/main.dir/src/derivative.cpp.s: cmake_force
 
 CMakeFiles/main.dir/src/flow_imsrg2.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/flow_imsrg2.cpp.o: ../src/flow_imsrg2.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/src/flow_imsrg2.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/flow_imsrg2.cpp.o"
 	/opt/software/GCCcore/6.4.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/flow_imsrg2.cpp.o -c /mnt/home/daviso53/Research/tcimsrg/src/flow_imsrg2.cpp
 
 CMakeFiles/main.dir/src/flow_imsrg2.cpp.i: cmake_force
@@ -105,7 +118,7 @@ CMakeFiles/main.dir/src/flow_imsrg2.cpp.s: cmake_force
 
 CMakeFiles/main.dir/src/hwrapper.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/hwrapper.cpp.o: ../src/hwrapper.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/hwrapper.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/src/hwrapper.cpp.o"
 	/opt/software/GCCcore/6.4.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/hwrapper.cpp.o -c /mnt/home/daviso53/Research/tcimsrg/src/hwrapper.cpp
 
 CMakeFiles/main.dir/src/hwrapper.cpp.i: cmake_force
@@ -116,9 +129,22 @@ CMakeFiles/main.dir/src/hwrapper.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/hwrapper.cpp.s"
 	/opt/software/GCCcore/6.4.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/home/daviso53/Research/tcimsrg/src/hwrapper.cpp -o CMakeFiles/main.dir/src/hwrapper.cpp.s
 
+CMakeFiles/main.dir/src/imsrg_utils.cpp.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/src/imsrg_utils.cpp.o: ../src/imsrg_utils.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/main.dir/src/imsrg_utils.cpp.o"
+	/opt/software/GCCcore/6.4.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/imsrg_utils.cpp.o -c /mnt/home/daviso53/Research/tcimsrg/src/imsrg_utils.cpp
+
+CMakeFiles/main.dir/src/imsrg_utils.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/imsrg_utils.cpp.i"
+	/opt/software/GCCcore/6.4.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/home/daviso53/Research/tcimsrg/src/imsrg_utils.cpp > CMakeFiles/main.dir/src/imsrg_utils.cpp.i
+
+CMakeFiles/main.dir/src/imsrg_utils.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/imsrg_utils.cpp.s"
+	/opt/software/GCCcore/6.4.0/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/home/daviso53/Research/tcimsrg/src/imsrg_utils.cpp -o CMakeFiles/main.dir/src/imsrg_utils.cpp.s
+
 CMakeFiles/main.dir/src/main.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/main.cpp.o: ../src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/main.dir/src/main.cpp.o"
 	/opt/software/GCCcore/6.4.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/main.cpp.o -c /mnt/home/daviso53/Research/tcimsrg/src/main.cpp
 
 CMakeFiles/main.dir/src/main.cpp.i: cmake_force
@@ -131,7 +157,7 @@ CMakeFiles/main.dir/src/main.cpp.s: cmake_force
 
 CMakeFiles/main.dir/src/occupation_factors.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/occupation_factors.cpp.o: ../src/occupation_factors.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/main.dir/src/occupation_factors.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/main.dir/src/occupation_factors.cpp.o"
 	/opt/software/GCCcore/6.4.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/occupation_factors.cpp.o -c /mnt/home/daviso53/Research/tcimsrg/src/occupation_factors.cpp
 
 CMakeFiles/main.dir/src/occupation_factors.cpp.i: cmake_force
@@ -144,7 +170,7 @@ CMakeFiles/main.dir/src/occupation_factors.cpp.s: cmake_force
 
 CMakeFiles/main.dir/src/pairinghamiltonian.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/pairinghamiltonian.cpp.o: ../src/pairinghamiltonian.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/main.dir/src/pairinghamiltonian.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/main.dir/src/pairinghamiltonian.cpp.o"
 	/opt/software/GCCcore/6.4.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/pairinghamiltonian.cpp.o -c /mnt/home/daviso53/Research/tcimsrg/src/pairinghamiltonian.cpp
 
 CMakeFiles/main.dir/src/pairinghamiltonian.cpp.i: cmake_force
@@ -157,7 +183,7 @@ CMakeFiles/main.dir/src/pairinghamiltonian.cpp.s: cmake_force
 
 CMakeFiles/main.dir/src/system.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/system.cpp.o: ../src/system.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/main.dir/src/system.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/main.dir/src/system.cpp.o"
 	/opt/software/GCCcore/6.4.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/system.cpp.o -c /mnt/home/daviso53/Research/tcimsrg/src/system.cpp
 
 CMakeFiles/main.dir/src/system.cpp.i: cmake_force
@@ -170,7 +196,7 @@ CMakeFiles/main.dir/src/system.cpp.s: cmake_force
 
 CMakeFiles/main.dir/src/white.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/white.cpp.o: ../src/white.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/main.dir/src/white.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/main.dir/src/white.cpp.o"
 	/opt/software/GCCcore/6.4.0/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/white.cpp.o -c /mnt/home/daviso53/Research/tcimsrg/src/white.cpp
 
 CMakeFiles/main.dir/src/white.cpp.i: cmake_force
@@ -183,9 +209,11 @@ CMakeFiles/main.dir/src/white.cpp.s: cmake_force
 
 # Object files for target main
 main_OBJECTS = \
+"CMakeFiles/main.dir/src/BACKEND_ublas.cpp.o" \
 "CMakeFiles/main.dir/src/derivative.cpp.o" \
 "CMakeFiles/main.dir/src/flow_imsrg2.cpp.o" \
 "CMakeFiles/main.dir/src/hwrapper.cpp.o" \
+"CMakeFiles/main.dir/src/imsrg_utils.cpp.o" \
 "CMakeFiles/main.dir/src/main.cpp.o" \
 "CMakeFiles/main.dir/src/occupation_factors.cpp.o" \
 "CMakeFiles/main.dir/src/pairinghamiltonian.cpp.o" \
@@ -195,9 +223,11 @@ main_OBJECTS = \
 # External object files for target main
 main_EXTERNAL_OBJECTS =
 
+main: CMakeFiles/main.dir/src/BACKEND_ublas.cpp.o
 main: CMakeFiles/main.dir/src/derivative.cpp.o
 main: CMakeFiles/main.dir/src/flow_imsrg2.cpp.o
 main: CMakeFiles/main.dir/src/hwrapper.cpp.o
+main: CMakeFiles/main.dir/src/imsrg_utils.cpp.o
 main: CMakeFiles/main.dir/src/main.cpp.o
 main: CMakeFiles/main.dir/src/occupation_factors.cpp.o
 main: CMakeFiles/main.dir/src/pairinghamiltonian.cpp.o
@@ -208,7 +238,7 @@ main: /mnt/home/daviso53/taco/build/lib/libtaco.so
 main: /opt/software/GCCcore/6.4.0/lib64/libgomp.so
 main: /lib64/libpthread.so
 main: CMakeFiles/main.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
