@@ -2,9 +2,9 @@
 
 To build program, run
 
-   mkdir build; cd build
-   cmake .. ../build/
-   ./main
+    mkdir build; cd build
+    cmake .. ../build/
+    ./main
 
 `CMakeLists.txt` will automatically link the main.cpp executable against the TACO library.
 
