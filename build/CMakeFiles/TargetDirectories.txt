@@ -1,3 +1,0 @@
-/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles/rebuild_cache.dir
-/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles/edit_cache.dir
-/mnt/home/daviso53/Research/tcimsrg/build/CMakeFiles/main.dir
