@@ -1,7 +1,7 @@
 #include "BACKEND.hpp"
 #include <stdio.h>
 //#include <math.h>
-//#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 using namespace boost::numeric::ublas;
 
@@ -22,14 +22,27 @@ private:
         return i*numStates*numStates*numStates + j*numStates*numStates + k*numStates + l;
     }
 
+    vector<double> occA, occB, occC, occD;
+
 public:
-    Backend_UBLAS(int numStates) {
+    Backend_UBLAS(int numStates, OccupationFactors *occFact) {        
+
+        std::string path = (*occFact).getPath();
+
         this->numStates = numStates;
+        this->occFact = occFact;
+        this->occA = vector<double>(numStates*numStates);
+        this->occB = vector<double>(numStates*numStates);
+        this->occC = vector<double>(numStates*numStates*numStates);        
+        this->occD = vector<double>(numStates*numStates*numStates*numStates);        
+        
+        (*occFact).contractOccTensors(path, this->occA, this->occB, this->occC, this->occD);
+        
     }
 
     double flow_0b(vector<double> &occA, vector<double> &occD, 
-                                  vector<double> &f, vector<double> &Gamma, 
-                                  vector<double> &eta1b, vector<double> &eta2b) {
+                   vector<double> &f, vector<double> &Gamma, 
+                   vector<double> &eta1b, vector<double> &eta2b) {
              
         // Return
         double dE = 0;
@@ -51,7 +64,7 @@ public:
                 ab = idxr2(a,b);
                 ba = idxr2(b,a);
 
-                dE += occA[ab]*eta1b[ab]*f[ba];                
+                dE += this->occA[ab]*eta1b[ab]*f[ba];                
             }
         }
 
@@ -65,7 +78,7 @@ public:
                         abcd = idxr4(a,b,c,d);
                         cdab = idxr4(c,d,a,b);
 
-                        dE += 0.5*eta2b[abcd]*Gamma[cdab]*occD[abcd];
+                        dE += 0.5*eta2b[abcd]*Gamma[cdab]*this->occD[abcd];
                     }
                 }
             }
@@ -126,7 +139,7 @@ public:
                         ab = idxr2(a,b);
                         biaj = idxr4(b,i,a,j);
 
-                        df[ij] += occA[ab]*(eta1b[ab]*Gamma[biaj] - f[ab]*eta2b[biaj]);
+                        df[ij] += this->occA[ab]*(eta1b[ab]*Gamma[biaj] - f[ab]*eta2b[biaj]);
                     }
                 }
 
@@ -146,7 +159,7 @@ public:
                             cjab = idxr4(c,j,a,b);
                             abci = idxr4(a,b,c,i);
 
-                            df[ij] += 0.5*occC[abc]*(eta2b[ciab]*Gamma[abcj] + eta2b[cjab]*Gamma[abci]);
+                            df[ij] += 0.5*this->occC[abc]*(eta2b[ciab]*Gamma[abcj] + eta2b[cjab]*Gamma[abci]);
                         }
                     }
                 }
@@ -224,14 +237,14 @@ public:
 
                                 //TERM 2
                                 dGamma[ijkl] += 0.5*
-                                    occB[ab]*(eta2b[ijab]*Gamma[abkl] - Gamma[ijab]*eta2b[abkl]);
+                                    this->occB[ab]*(eta2b[ijab]*Gamma[abkl] - Gamma[ijab]*eta2b[abkl]);
 
                                 //TERM 3
                                 dGamma[ijkl] -=
-                                    occA[ab]*(eta2b[bjal]*Gamma[aibk] -
-                                              eta2b[bial]*Gamma[ajbk] -
-                                              eta2b[bjak]*Gamma[aibl] +
-                                              eta2b[biak]*Gamma[ajbl]);
+                                    this->occA[ab]*(eta2b[bjal]*Gamma[aibk] -
+                                                    eta2b[bial]*Gamma[ajbk] -
+                                                    eta2b[bjak]*Gamma[aibl] +
+                                                    eta2b[biak]*Gamma[ajbl]);
                                 
                             }
                         }

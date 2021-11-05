@@ -2,12 +2,16 @@
 #define BACKEND_HPP_
 
 #include <boost/numeric/ublas/vector.hpp>
+#include "occupation_factors.hpp"
 #include "imsrg_utils.hpp"
 
 class Backend {
 
 
 public:
+
+    OccupationFactors *occFact;
+    
     
     virtual double flow_0b(boost::numeric::ublas::vector<double> &occA,
                            boost::numeric::ublas::vector<double> &occD,

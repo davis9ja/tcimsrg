@@ -53,12 +53,14 @@ int main() {
         ref[p] = val;
     }
     //ref.pack();
+
+    OccupationFactors occ(nholes, nparticles, ref);
+
     Backend *backend; 
-    Backend_UBLAS cb_ublas(numStates);
+    Backend_UBLAS cb_ublas(numStates, &occ);
     backend = &cb_ublas;
 
     White white(nholes, nparticles, ref);
-    OccupationFactors occ(nholes, nparticles, ref);
     PairingHamiltonian H(nholes, nparticles, ref, d,g,pb);
     Flow_IMSRG2 flow(occ, backend);
 
