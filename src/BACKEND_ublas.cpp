@@ -40,8 +40,7 @@ public:
         
     }
 
-    double flow_0b(vector<double> &occA, vector<double> &occD, 
-                   vector<double> &f, vector<double> &Gamma, 
+    double flow_0b(vector<double> &f, vector<double> &Gamma, 
                    vector<double> &eta1b, vector<double> &eta2b) {
              
         // Return
@@ -89,9 +88,8 @@ public:
         return dE;
     }
 
-    vector<double> flow_1b(vector<double> &occA, vector<double> &occC, 
-                                          vector<double> &f, vector<double> &Gamma, 
-                                          vector<double> &eta1b, vector<double> &eta2b) {
+    vector<double> flow_1b(vector<double> &f, vector<double> &Gamma, 
+                           vector<double> &eta1b, vector<double> &eta2b) {
 
         // Return 
         vector<double> df(numStates*numStates);
@@ -176,9 +174,8 @@ public:
         
     }
 
-    vector<double> flow_2b(vector<double> &occA, vector<double> &occB, 
-                                          vector<double> &f, vector<double> &Gamma, 
-                                          vector<double> &eta1b, vector<double> &eta2b) {
+    vector<double> flow_2b(vector<double> &f, vector<double> &Gamma, 
+                           vector<double> &eta1b, vector<double> &eta2b) {
         // Return
         vector<double> dGamma(numStates*numStates*numStates*numStates);
         for (int i =0; i < dGamma.size(); i++)
