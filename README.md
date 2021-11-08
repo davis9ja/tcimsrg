@@ -10,6 +10,15 @@ To build program, run
 
 Tensor Algebra Compiler code at [https://github.com/tensor-compiler/taco]()
 
+### TODO:
+
+- [ ] Make SystemObserver a singleton class
+  - necessary to reconcile flow data across all systems
+- [ ] Implement TACO backend
+  - pass occupation tensors directly so no conversion?
+- [ ] Add density matrix normal-ordering functionality
+- [ ] Remove particle-hole distinction
+  - This makes density matrix process simpler
 
 ## Purpose
 Build system for solving the pairing-plus-particle-hole model Hamiltonian using IMSRG(2). 
