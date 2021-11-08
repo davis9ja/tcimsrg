@@ -8,26 +8,12 @@
 #include "white.hpp"
 #include "flow_imsrg2.hpp"
 #include "system.hpp"
+#include "system_observer.hpp"
 #include "BACKEND_ublas.cpp"
 
 //#include "derivative.hpp"
 
 
-struct push_back_system {
-    std::vector<state_type> &m_states;
-    std::vector<double> &m_times;
-    System *sys;
-
-    push_back_system( std::vector< state_type > &states , std::vector< double > &times , System *sys)
-        : m_states( states ) , m_times( times ) { this->sys = sys; }
-
-    void operator()( const state_type &x , double t )
-    {
-        m_states.push_back( x );
-        m_times.push_back( t );
-        std::cout << t << "\t" << x[0] << "\t"  << (*sys).getEta2bNorm() << std::endl;
-    }
-};
 
 
 int main() {
@@ -160,21 +146,20 @@ int main() {
     // result() = c.E() + dcdt.E();
     // cout << result << endl;
 
-    
-    System sys(numStates, E, f, Gamma, W, &white, &flow);                                                     //
-                                                                                                              //
-    std::vector<state_type> x_vec;                                                                            //
-    std::vector<double> times;                                                                                //
-    printf("geting ready for integration\n");                                                                 //
-                                                                                                              //
+    std::vector<state_type> x_vec;
+    std::vector<double> times;
+
+    SystemObserver *observer = new SystemObserver(x_vec, times);
+    System sys(numStates, E, f, Gamma, W, &white, &flow, observer);
     state_type y0(1+f.size()+Gamma.size());
+
     sys.system2vector(E, f, Gamma, y0);
 
-    printf("starting integration\n");                                                                         //
-                                                                                                              //
-    runge_kutta4<state_type> stepper;                                                                         //
-    size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500, push_back_system(x_vec, times, &sys)); //
-    
+    runge_kutta4<state_type> stepper;
+    //size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500);
+    size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500, *observer);
+
+    delete observer;
 
     // for(size_t i = 0; i<=steps; i++)
     //     cout << times[i] << '\t' << x_vec[i][0] << '\n';

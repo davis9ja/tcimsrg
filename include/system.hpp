@@ -9,8 +9,9 @@
 #include "taco.h"
 #include "white.hpp"
 #include "flow_imsrg2.hpp"
+#include "system_observer.hpp"
+#include "state_type.hpp"
 
-typedef boost::numeric::ublas::vector<double> state_type;
 
 class System {
 
@@ -20,6 +21,8 @@ private:
 
     double dE;
     boost::numeric::ublas::vector<double> df, dGamma;
+
+    SystemObserver *observer;
 
 public:
     
@@ -37,7 +40,8 @@ public:
     System(int numStates,
            double &E, boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W,
            White *white, 
-           Flow_IMSRG2 *flow
+           Flow_IMSRG2 *flow,
+           SystemObserver *observer
            );
 
     void system2vector(double &E, 

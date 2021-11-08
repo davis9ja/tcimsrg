@@ -6,7 +6,7 @@ using namespace boost::numeric::ublas;
 
 System::System(int numStates,
                double &E, vector<double> &f, vector<double> &Gamma, vector<double> &W,
-               White *white, Flow_IMSRG2 *flow) {
+               White *white, Flow_IMSRG2 *flow, SystemObserver *observer) {
 
     int fSize = numStates*numStates;
     int GammaSize = fSize*fSize;
@@ -18,7 +18,7 @@ System::System(int numStates,
     this->W = W;
     this->white = white;
     this->flow = flow;
-    
+    this->observer = observer;
     
     //this->sys_vec = vector<double>(1+fSize+GammaSize);
 
@@ -29,6 +29,8 @@ System::System(int numStates,
     // }
 
     //system2vector();
+
+    //printf("%8s\t%10s\t%10s\t%10s\n", "s", "E", "||eta1b||", "||eta2b||");
 }
 
 void System::system2vector(double &E, vector<double> &f, vector<double> &Gamma, state_type &x) {
@@ -151,11 +153,20 @@ void System::operator() (const state_type &x, state_type &dxdt, const double t) 
     // Set derivative
     system2vector(dE, df, dGamma, dxdt);
 
-    // double norm = 0.0;
-    // for (int i = 0; i < eta2b.size(); i++)
-    //     norm += eta2b[i]*eta2b[i];
+    double norm;
 
-    // this->eta2b_norm = sqrt(norm);
+    norm = 0.0;
+    for (int i = 0; i < eta1b.size(); i++)
+        norm += eta1b[i]*eta1b[i];
+    this->eta1b_norm = sqrt(norm);
+
+    norm = 0.0;
+    for (int i = 0; i < eta2b.size(); i++)
+        norm += eta2b[i]*eta2b[i];
+    this->eta2b_norm = sqrt(norm);
+
+
+    (*observer).setEta2bNorm(this->eta2b_norm);
     // std::cout << eta2b_norm << std::endl;
     
     //std::cout << "eta2b, " << this->getEta2bNorm() << std::endl;
@@ -169,5 +180,7 @@ void System::operator() (const state_type &x, state_type &dxdt, const double t) 
     
     // for (int i = 0; i  < sys_vec.size(); i++)
     //     cout << sys_vec[i] << endl;
+
+    //printf("%8s\t%10s\t%10s\t%10s\n", t, x[0], this->eta1b_norm, this->eta2b_norm);
 }
 
