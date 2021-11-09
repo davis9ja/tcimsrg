@@ -41,6 +41,9 @@ Handles computation of the flow equations. Transforms occupation tensors to UBLA
 `system.cpp`\
 ODE system class for `boost::numeric::odeint`. Track E, f, Gamma and dE, df, dGamma while passing through solver.
 
+`system_observer.cpp`\
+Singleton class that observes and outputs flow data. Passed to ODEINT solver.
+
 `occupation_factors.cpp`\
 Write to file tensor-train decomposed occupation factors that appear in the flow equations. Also handles reading back into memory pointer.
 
