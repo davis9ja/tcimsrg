@@ -19,6 +19,9 @@ int main(int argc, char **argv) {
     using namespace taco;
     using namespace boost::numeric::odeint;
     using namespace boost::numeric::ublas;
+    adams_bashforth_moulton<5, state_type> abm_stepper;
+    runge_kutta4<state_type> rk_stepper;
+
     //using namespace std;
 
     int nholes = 4;
@@ -29,6 +32,8 @@ int main(int argc, char **argv) {
     double t0 = std::atof(argv[3]);
     double t1 = std::atof(argv[4]);
     double dt = std::atof(argv[5]);
+
+    int solver = std::atoi(argv[6]);
 
     int numStates = nholes + nparticles;
     vector<double> ref(numStates);
@@ -148,8 +153,8 @@ int main(int argc, char **argv) {
     // result() = c.E() + dcdt.E();
     // cout << result << endl;
 
-    std::vector<state_type> x_vec;
-    std::vector<double> times;
+    // std::vector<state_type> x_vec;
+    // std::vector<double> times;
 
     //static SystemObserver *observer; //= observer.getInstance(); //new SystemObserver(x_vec, times);
     //SystemObserver *observer = observer->getInstance();
@@ -159,10 +164,20 @@ int main(int argc, char **argv) {
 
     sys.system2vector(E, f, Gamma, y0);
 
-    runge_kutta4<state_type> stepper;
     //size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500);
     //size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500, sys);
-    size_t steps = integrate_adaptive(stepper, sys, y0, t0, t1, dt, sys);
+
+    size_t steps;
+    switch (solver) {
+    case 0:
+        steps = integrate_adaptive(abm_stepper, sys, y0, t0, t1, dt, sys);
+        break;
+    case 1:
+        steps = integrate_adaptive(rk_stepper, sys, y0, t0, t1, dt, sys);
+        break;
+    default:
+        steps = integrate_adaptive(abm_stepper, sys, y0, t0, t1, dt, sys);        
+    }
 
     //delete observer;
 
