@@ -9,7 +9,6 @@
 #include "taco.h"
 #include "white.hpp"
 #include "flow_imsrg2.hpp"
-#include "system_observer.hpp"
 #include "state_type.hpp"
 
 

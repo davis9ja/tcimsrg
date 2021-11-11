@@ -8,12 +8,10 @@
 #include "white.hpp"
 #include "flow_imsrg2.hpp"
 #include "system.hpp"
-#include "system_observer.hpp"
 #include "BACKEND_ublas.cpp"
 
 //#include "derivative.hpp"
 
-SystemObserver *SystemObserver::instance = 0;
 
 
 int main() {
