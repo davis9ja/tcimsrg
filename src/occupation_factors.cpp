@@ -104,8 +104,6 @@ void OccupationFactors::contractOccTensors(std::string factor_path,
     tensor2vector(occB_t, occB);
     tensor2vector(occC_t, occC);
     tensor2vector(occD_t, occD);
-
-    std::cout << "OCCUPATIONTENSORS OCCA " << occA << std::endl;
     
 }
 

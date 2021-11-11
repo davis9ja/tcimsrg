@@ -13,7 +13,7 @@
 
 //#include "derivative.hpp"
 
-
+SystemObserver *SystemObserver::instance = 0;
 
 
 int main() {
@@ -26,7 +26,7 @@ int main() {
     int nparticles = 4;
     double d = 1.0;
     double g = 0.5;
-    double pb = 0.0;
+    double pb = 0.01;
 
     int numStates = nholes + nparticles;
     vector<double> ref(numStates);
@@ -73,61 +73,61 @@ int main() {
     // }
 
 
-    time_t ti, tf;
+    // time_t ti, tf;
 
-    ti = clock();
-    vector<double> eta1b = white.compute_1b(f, Gamma, W);
-    tf = clock();
-    printf("calculate eta1b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
+    // ti = clock();
+    // vector<double> eta1b = white.compute_1b(f, Gamma, W);
+    // tf = clock();
+    // printf("calculate eta1b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
 
-    ti = clock();
-    vector<double> eta2b = white.compute_2b(f, Gamma, W);
-    tf = clock();
-    printf("calculate eta2b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
+    // ti = clock();
+    // vector<double> eta2b = white.compute_2b(f, Gamma, W);
+    // tf = clock();
+    // printf("calculate eta2b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
 
-    ti = clock();
-    double flow_0b = flow.flow_0b(f, Gamma, eta1b, eta2b);
-    tf = clock();
-    printf("calculate flow_0b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
+    // ti = clock();
+    // double flow_0b = flow.flow_0b(f, Gamma, eta1b, eta2b);
+    // tf = clock();
+    // printf("calculate flow_0b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
 
-    ti = clock();
-    vector<double> flow_1b = flow.flow_1b(f, Gamma, eta1b, eta2b);
-    tf = clock();
-    printf("calculate flow_1b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
+    // ti = clock();
+    // vector<double> flow_1b = flow.flow_1b(f, Gamma, eta1b, eta2b);
+    // tf = clock();
+    // printf("calculate flow_1b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
 
-    ti = clock();
-    vector<double> flow_2b = flow.flow_2b(f, Gamma, eta1b, eta2b);
-    tf = clock();
-    printf("calculate flow_2b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
+    // ti = clock();
+    // vector<double> flow_2b = flow.flow_2b(f, Gamma, eta1b, eta2b);
+    // tf = clock();
+    // printf("calculate flow_2b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
 
 
-    // for (int i = 0; i < numStates; i++)
-    //     for (int j = 0; j < numStates; j++)
-    //         std::cout << i << j << " " << f[i*numStates+j] << std::endl;
+    // // for (int i = 0; i < numStates; i++)
+    // //     for (int j = 0; j < numStates; j++)
+    // //         std::cout << i << j << " " << f[i*numStates+j] << std::endl;
     
 
-    //eta1b = white.compute_1b(flow_1b, flow_2b, W);
+    // //eta1b = white.compute_1b(flow_1b, flow_2b, W);
 
 
-    printf("ETA1B ********************************\n");
-    std::cout << eta1b << std::endl;
+    // printf("ETA1B ********************************\n");
+    // std::cout << eta1b << std::endl;
 
-    printf("ETA2B ********************************\n");
-    std::cout << eta2b << std::endl;
+    // printf("ETA2B ********************************\n");
+    // std::cout << eta2b << std::endl;
 
-    printf("FLOW0B ********************************\n");
-    std::cout << flow_0b << std::endl;
+    // printf("FLOW0B ********************************\n");
+    // std::cout << flow_0b << std::endl;
     
-    printf("FLOW1B ********************************\n");
-    std::cout << flow_1b << std::endl;
+    // printf("FLOW1B ********************************\n");
+    // std::cout << flow_1b << std::endl;
 
-    printf("FLOW2B ********************************\n");
-    std::cout << flow_2b << std::endl;
+    // printf("FLOW2B ********************************\n");
+    // std::cout << flow_2b << std::endl;
 
-    //vector<double> ref = H.getReference();
-    //double result = static_cast<const double*>(E.getStorage().getValues().getData())[0];
+    // //vector<double> ref = H.getReference();
+    // //double result = static_cast<const double*>(E.getStorage().getValues().getData())[0];
 
-    std::cout << E  << std::endl;
+    // std::cout << E  << std::endl;
     //std::cout << ref << std::endl;
 
     // state_type c;
@@ -149,17 +149,20 @@ int main() {
     std::vector<state_type> x_vec;
     std::vector<double> times;
 
-    SystemObserver *observer = new SystemObserver(x_vec, times);
-    System sys(numStates, E, f, Gamma, W, &white, &flow, observer);
+    //static SystemObserver *observer; //= observer.getInstance(); //new SystemObserver(x_vec, times);
+    //SystemObserver *observer = observer->getInstance();
+
+    System sys(numStates, E, f, Gamma, W, &white, &flow );
     state_type y0(1+f.size()+Gamma.size());
 
     sys.system2vector(E, f, Gamma, y0);
 
     runge_kutta4<state_type> stepper;
     //size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500);
-    size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500, *observer);
+    //size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500, sys);
+    size_t steps = integrate_adaptive(stepper, sys, y0, 0.0, 10.0, 0.1, sys);
 
-    delete observer;
+    //delete observer;
 
     // for(size_t i = 0; i<=steps; i++)
     //     cout << times[i] << '\t' << x_vec[i][0] << '\n';

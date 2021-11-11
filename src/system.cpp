@@ -6,7 +6,7 @@ using namespace boost::numeric::ublas;
 
 System::System(int numStates,
                double &E, vector<double> &f, vector<double> &Gamma, vector<double> &W,
-               White *white, Flow_IMSRG2 *flow, SystemObserver *observer) {
+               White *white, Flow_IMSRG2 *flow) {
 
     int fSize = numStates*numStates;
     int GammaSize = fSize*fSize;
@@ -18,7 +18,7 @@ System::System(int numStates,
     this->W = W;
     this->white = white;
     this->flow = flow;
-    this->observer = observer;
+    //this->observer = observer->getInstance();
     
     //this->sys_vec = vector<double>(1+fSize+GammaSize);
 
@@ -153,21 +153,12 @@ void System::operator() (const state_type &x, state_type &dxdt, const double t) 
     // Set derivative
     system2vector(dE, df, dGamma, dxdt);
 
-    double norm;
 
-    norm = 0.0;
-    for (int i = 0; i < eta1b.size(); i++)
-        norm += eta1b[i]*eta1b[i];
-    this->eta1b_norm = sqrt(norm);
+    //observer->setEta2bNorm(this->eta2b_norm);
 
-    norm = 0.0;
-    for (int i = 0; i < eta2b.size(); i++)
-        norm += eta2b[i]*eta2b[i];
-    this->eta2b_norm = sqrt(norm);
+    //printf("%0.4f\t%0.8f\t%0.8f\n", t, x[0], this->eta2b_norm);
 
-
-    (*observer).setEta2bNorm(this->eta2b_norm);
-    // std::cout << eta2b_norm << std::endl;
+    //std::cout << this->eta2b_norm << std::endl;
     
     //std::cout << "eta2b, " << this->getEta2bNorm() << std::endl;
 
@@ -184,3 +175,34 @@ void System::operator() (const state_type &x, state_type &dxdt, const double t) 
     //printf("%8s\t%10s\t%10s\t%10s\n", t, x[0], this->eta1b_norm, this->eta2b_norm);
 }
 
+void System::operator()( const state_type &x , double t )
+{
+    //states.push_back( x );
+    //times.push_back( t );
+    //std::cout << t << "\t" << x[0] << "\t"  << eta2b_norm << std::endl;
+    double norm;
+    vector<double> eta1b, eta2b;
+
+    if (t == 0.0)
+        printf("%-4s\t%-8s\t%-8s\t%-8s\n", "t", "E", "||eta1b||", "||eta2b||");
+
+    vector2system(x, f.size(), E, f, Gamma);
+
+    // Compute generator from state
+    eta1b = (*white).compute_1b(f, Gamma, W);
+    eta2b = (*white).compute_2b(f, Gamma, W);
+
+    norm = 0.0;
+    for (int i = 0; i < eta1b.size(); i++)
+        norm += eta1b[i]*eta1b[i];
+    eta1b_norm = sqrt(norm);
+
+    
+    norm = 0.0;
+    for (int i = 0; i < eta2b.size(); i++)
+        norm += eta2b[i]*eta2b[i];
+    eta2b_norm = sqrt(norm);
+
+
+    printf("%0.4f\t%0.8f\t%0.8f\t%0.8f\n", t, x[0], eta1b_norm, eta2b_norm);
+}

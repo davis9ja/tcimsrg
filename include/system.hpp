@@ -22,7 +22,7 @@ private:
     double dE;
     boost::numeric::ublas::vector<double> df, dGamma;
 
-    SystemObserver *observer;
+    //SystemObserver *observer;
 
 public:
     
@@ -40,8 +40,7 @@ public:
     System(int numStates,
            double &E, boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W,
            White *white, 
-           Flow_IMSRG2 *flow,
-           SystemObserver *observer
+           Flow_IMSRG2 *flow
            );
 
     void system2vector(double &E, 
@@ -57,6 +56,8 @@ public:
     void reinitSystem(state_type x);
     void operator() (const state_type &x, state_type &dxdt, const double t);
     void write_step();
+
+    void operator()(const state_type &x , double t);
     
 };
 
