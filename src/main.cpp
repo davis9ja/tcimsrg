@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctime>
 #include <boost/numeric/odeint.hpp>
 
@@ -14,7 +15,7 @@
 
 
 
-int main() {
+int main(int argc, char **argv) {
     using namespace taco;
     using namespace boost::numeric::odeint;
     using namespace boost::numeric::ublas;
@@ -23,8 +24,11 @@ int main() {
     int nholes = 4;
     int nparticles = 4;
     double d = 1.0;
-    double g = 0.5;
-    double pb = 0.01;
+    double g = std::atof(argv[1]);
+    double pb = std::atof(argv[2]);
+    double t0 = std::atof(argv[3]);
+    double t1 = std::atof(argv[4]);
+    double dt = std::atof(argv[5]);
 
     int numStates = nholes + nparticles;
     vector<double> ref(numStates);
@@ -158,7 +162,7 @@ int main() {
     runge_kutta4<state_type> stepper;
     //size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500);
     //size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500, sys);
-    size_t steps = integrate_adaptive(stepper, sys, y0, 0.0, 10.0, 0.1, sys);
+    size_t steps = integrate_adaptive(stepper, sys, y0, t0, t1, dt, sys);
 
     //delete observer;
 
