@@ -10,7 +10,7 @@
 #include "flow_imsrg2.hpp"
 #include "system.hpp"
 #include "BACKEND_ublas.cpp"
-
+#include "BACKEND_taco.cpp"
 //#include "derivative.hpp"
 
 
@@ -32,8 +32,8 @@ int main(int argc, char **argv) {
     double t0 = std::atof(argv[3]);
     double t1 = std::atof(argv[4]);
     double dt = std::atof(argv[5]);
-
     int solver = std::atoi(argv[6]);
+    int BACKEND_id = std::atoi(argv[7]);
 
     int numStates = nholes + nparticles;
     vector<double> ref(numStates);
@@ -51,7 +51,20 @@ int main(int argc, char **argv) {
 
     Backend *backend; 
     Backend_UBLAS cb_ublas(numStates, &occ);
-    backend = &cb_ublas;
+    Backend_TACO cb_taco(numStates, &occ);
+
+    switch (BACKEND_id) {
+    case 0:
+        backend = &cb_ublas;
+        break;
+        
+    case 1:
+        backend = &cb_taco;
+        break;
+
+    default:
+        backend = &cb_ublas;
+    }
 
     White white(nholes, nparticles, ref);
     PairingHamiltonian H(nholes, nparticles, ref, d,g,pb);
