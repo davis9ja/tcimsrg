@@ -24,8 +24,9 @@ int main(int argc, char **argv) {
 
     //using namespace std;
 
-    int nholes = 4;
-    int nparticles = 4;
+    // int nholes = 4;
+    // int nparticles = 4;
+    int numStates = 10;
     double d = 1.0;
     double g = std::atof(argv[1]);
     double pb = std::atof(argv[2]);
@@ -35,19 +36,19 @@ int main(int argc, char **argv) {
     int solver = std::atoi(argv[6]);
     int BACKEND_id = std::atoi(argv[7]);
 
-    int numStates = nholes + nparticles;
+    //int numStates = nholes + nparticles;
     vector<double> ref(numStates);
-
+    
     double val = 0.0;
     for (int p = 0; p < numStates; p++) {
-        val = (p < nholes) ? 1.0 : 0.0;
+        val = (p < (int)numStates/2) ? 1.0 : 0.0;
         //printf("%0.2f\n",val);
         //ref.insert({p}, val);
         ref[p] = val;
     }
     //ref.pack();
 
-    OccupationFactors occ(nholes, nparticles, ref);
+    OccupationFactors occ(numStates, ref);
 
     Backend *backend; 
     Backend_UBLAS cb_ublas(numStates, &occ);
@@ -66,8 +67,8 @@ int main(int argc, char **argv) {
         backend = &cb_ublas;
     }
 
-    White white(nholes, nparticles, ref);
-    PairingHamiltonian H(nholes, nparticles, ref, d,g,pb);
+    White white(numStates, ref);
+    PairingHamiltonian H(numStates, ref, d,g,pb);
     Flow_IMSRG2 flow(occ, backend);
 
     double E = H.get_E();

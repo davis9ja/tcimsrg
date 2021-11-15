@@ -5,20 +5,21 @@
 
 using namespace taco;
 using namespace boost::numeric::ublas;
-PairingHamiltonian::PairingHamiltonian(int n_holes, int n_particles, vector<double> ref, double d, double g, double pb) 
+PairingHamiltonian::PairingHamiltonian(int numStates, vector<double> ref, double d, double g, double pb) 
 {
     this->d = d;
     this->g = g;
     this->pb = pb;
+    this->numStates = numStates;
 
-    this->n_holes = n_holes;
-    this->n_particles = n_particles;
+    // this->n_holes = n_holes;
+    // this->n_particles = n_particles;
 
-    int numStates = n_holes+n_particles;
+    //int numStates = n_holes+n_particles;
 
-    spBasis = (int*)malloc(numStates*sizeof(int));
-    holes = (int*)malloc(n_holes*sizeof(int));
-    particles = (int*)malloc(n_particles*sizeof(int));
+    // spBasis = (int*)malloc(numStates*sizeof(int));
+    // holes = (int*)malloc(n_holes*sizeof(int));
+    // particles = (int*)malloc(n_particles*sizeof(int));
     
     
     // Declare H1B
@@ -42,13 +43,13 @@ PairingHamiltonian::PairingHamiltonian(int n_holes, int n_particles, vector<doub
         H2B[i] = 0.;
 
     // Fill hole and particle index containers
-    double ref_i;
-    for (int i = 0; i < n_holes; i++) {
-        ref_i = ref[i];
+    // double ref_i;
+    // for (int i = 0; i < n_holes; i++) {
+    //     ref_i = ref[i];
 
-        if (ref_i >= 0.5)
-            holes[i] = i;
-    }
+    //     if (ref_i >= 0.5)
+    //         holes[i] = i;
+    // }
         
 
     // Construct the vacuum Hamiltonian and fill spBasis
@@ -56,7 +57,7 @@ PairingHamiltonian::PairingHamiltonian(int n_holes, int n_particles, vector<doub
     int idx1b, idx2b;
     for (int p = 0; p < numStates; p++) {
         
-        spBasis[p] = p;
+        //spBasis[p] = p;
 
         //H1B.insert({p,p}, this->d*(int)(p/2));
         idx1b = p*numStates + p;
@@ -225,11 +226,11 @@ int PairingHamiltonian::deltaPB(int p, int q, int r, int s) {
 //     }
 // }
 
-PairingHamiltonian::~PairingHamiltonian() {
-    //free(ref);
-    free(holes);
-    free(particles);
-    free(spBasis);
-    //free(H1B);
-    //free(H2B);
-}
+// PairingHamiltonian::~PairingHamiltonian() {
+//     //free(ref);
+//     free(holes);
+//     free(particles);
+//     free(spBasis);
+//     //free(H1B);
+//     //free(H2B);
+// }

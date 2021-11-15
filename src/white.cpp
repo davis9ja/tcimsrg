@@ -5,12 +5,12 @@
 
 using namespace boost::numeric::ublas;
 
-White::White(int n_holes, int n_particles, vector<double> &ref) {
-    this->n_holes = n_holes;
-    this->n_particles = n_particles;
-    this->reference = ref;
+White::White(int numStates, vector<double> &ref) {
+    // this->n_holes = n_holes;
+    // this->n_particles = n_particles;
 
-    this->numStates = n_holes+n_particles;
+    this->reference = ref;
+    this->numStates = numStates;
 
     // f1b = Format({Dense,Dense});
     // f2b = Format({Dense,Dense,Dense,Dense});

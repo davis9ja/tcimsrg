@@ -4,10 +4,11 @@
 using namespace taco;
 using namespace boost::numeric::ublas;
 
-OccupationFactors::OccupationFactors(int n_holes, int n_particles, vector<double> ref)
+OccupationFactors::OccupationFactors(int numStates, vector<double> ref)
 {
-    this->n_holes = n_holes;
-    this->n_particles = n_particles;
+    // this->n_holes = n_holes;
+    // this->n_particles = n_particles;
+    this->numStates = numStates;
     this->ref = ref;
 
     const char* path_char = &path[0];
@@ -60,7 +61,7 @@ void OccupationFactors::contractOccTensors(std::string factor_path,
                                            vector<double> &occB, 
                                            vector<double> &occC,
                                            vector<double> &occD) {
-    int numStates = n_holes+n_particles;
+    //int numStates = n_holes+n_particles;
 
     Tensor<double> 
         occA_a, occA_b, 
@@ -108,7 +109,7 @@ void OccupationFactors::contractOccTensors(std::string factor_path,
 }
 
 void OccupationFactors::writeA() {
-    int numStates = n_holes+n_particles;
+    //int numStates = n_holes+n_particles;
 
     Tensor<double> occA_a({numStates,2}, Format({Dense,Dense}));
     Tensor<double> occA_b({2,numStates}, Format({Dense,Dense}));
@@ -131,7 +132,7 @@ void OccupationFactors::writeA() {
 }
 
 void OccupationFactors::writeB() {
-    int numStates = n_holes+n_particles;
+    //int numStates = n_holes+n_particles;
 
     Tensor<double> occB_a({numStates,2}, Format({Dense,Dense}));
     Tensor<double> occB_b({2,numStates}, Format({Dense,Dense}));
@@ -153,7 +154,7 @@ void OccupationFactors::writeB() {
 }
 
 void OccupationFactors::writeC() {
-    int numStates = n_holes+n_particles;
+    //int numStates = n_holes+n_particles;
 
     Tensor<double> occC_a({numStates,4}, Format({Dense,Dense}));
     Tensor<double> occC_b({4,numStates,4}, Format({Dense,Dense,Dense}));
@@ -187,7 +188,7 @@ void OccupationFactors::writeC() {
 }
 
 void OccupationFactors::writeD() {
-    int numStates = n_holes+n_particles;
+    //int numStates = n_holes+n_particles;
 
     Tensor<double> occD_a({numStates,2}, Format({Dense,Dense}));
     Tensor<double> occD_b({2,numStates}, Format({Dense,Dense}));

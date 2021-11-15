@@ -13,8 +13,9 @@ class OccupationFactors {
 
 private:
     
-    int n_holes;
-    int n_particles;
+    // int n_holes;
+    // int n_particles;
+    int numStates;
     boost::numeric::ublas::vector<double> ref;
 
     void writeA();
@@ -26,11 +27,11 @@ private:
 
 public:
     
-    OccupationFactors(int n_holes, int n_particles, boost::numeric::ublas::vector<double> ref);
+    OccupationFactors(int numStates, boost::numeric::ublas::vector<double> ref);
     std::string getPath();
     //~OccupationFactors();
 
-    int getNumStates() { return n_holes+n_particles; }
+    int getNumStates() { return numStates; }
 
     void readOccTensors(std::string factor_path,
                         taco::Tensor<double> &occA_a, taco::Tensor<double> &occA_b, 

@@ -13,7 +13,7 @@ private:
     //taco::Format f1b, f2b, f3b;
 
 public:
-    White(int n_holes, int n_particles, boost::numeric::ublas::vector<double> &reference);
+    White(int numStates, boost::numeric::ublas::vector<double> &reference);
 
     boost::numeric::ublas::vector<double> compute_1b(boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W);
     boost::numeric::ublas::vector<double> compute_2b(boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W);

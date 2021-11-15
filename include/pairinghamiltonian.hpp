@@ -28,26 +28,28 @@ private:
     double g;
     double pb;
 
-    int* spBasis;
-    int* holes;
-    int* particles;
+    // int* spBasis;
+    // int* holes;
+    // int* particles;
 public:
 
-    int n_holes;
-    int n_particles;
+    // int n_holes;
+    // int n_particles;
     //boost::numeric::ublas::vector<double> ref; //= std::make_unique<int[]>(n_holes+n_particles);
 
-    PairingHamiltonian(int n_holes, int n_particles, boost::numeric::ublas::vector<double> ref, double d, double g, double pb);
-    ~PairingHamiltonian();
+    int numStates;
+
+    PairingHamiltonian(int numStates, boost::numeric::ublas::vector<double> ref, double d, double g, double pb);
+    //~PairingHamiltonian();
 
     double getSpacing() { return d; }
     double getStrength() { return g; }
     double getPBStrength() { return pb; }
     //boost::numeric::ublas::vector<double> getReference() { return ref; }
     
-    int* get_basisIdx() { return spBasis; }
-    int* get_holesIdx() { return holes; }
-    int* get_particlesIdx() { return particles; }
+    // int* get_basisIdx() { return spBasis; }
+    // int* get_holesIdx() { return holes; }
+    // int* get_particlesIdx() { return particles; }
 
     boost::numeric::ublas::vector<double> get_1B() { return H1B; }
     boost::numeric::ublas::vector<double> get_2B() { return H2B; }
