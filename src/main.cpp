@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ctime>
 #include <boost/numeric/odeint.hpp>
+#include <chrono>
 
 #include "taco.h"
 #include "pairinghamiltonian.hpp"
@@ -13,7 +14,88 @@
 #include "BACKEND_taco.cpp"
 //#include "derivative.hpp"
 
+void process_user_input(int argc, char **argv, 
+                        int &numStates, 
+                        double &d, double &g, double &pb, 
+                        double &t0, double &t1, double &dt,
+                        int &solver, int &BACKEND_id) {
 
+    // SET DEFAULT PARAMS
+    numStates = 8;
+    d = 1.0;
+    g = 0.5;
+    pb = 0.0;
+    t0 = 0.0;
+    t1 = 5.0;
+    dt = 0.1;
+    solver = 0;
+    BACKEND_id = 1;
+    
+    std::cout << "Running IMSRG(2) on pairing-plus-particle-hole model\n";
+    if (argc > 1) {
+        for (int i = 1; i < argc; i++) {
+            size_t pos = 0;
+            std::string delim = "=";
+            std::string line(argv[i]);
+            std::string token, param_str, param_val;
+
+            pos = line.find(delim);
+            token = line.substr(0, pos);
+            line.erase(0, pos + delim.length());
+            
+            param_str = token;
+            param_val = line;
+
+            if (param_str == "numStates")
+                numStates = std::stoi(param_val);
+            else if (param_str == "d")
+                d = std::stof(param_val);
+            else if (param_str == "g")
+                g = std::stof(param_val);
+            else if (param_str == "pb")
+                pb = std::stof(param_val);
+            else if (param_str == "t0")
+                t0 = std::stof(param_val);
+            else if (param_str == "t1")
+                t1 = std::stof(param_val);
+            else if (param_str == "dt")
+                dt = std::stof(param_val);
+            else if (param_str == "solver")
+                solver = std::stof(param_val);
+            else if (param_str == "BACKEND_id")
+                BACKEND_id = std::stof(param_val);
+            else
+                std::cout << param_str << " not recognized as input parameter.\n" << std::endl;
+        }
+    }
+
+
+    printf("Parameters:\n\t# s.p. states = %d\n\td=%0.3f\n\tg=%0.3f\n\tpb=%0.3f\n", numStates, d, g, pb);
+
+    std::cout << "ODE Stepper = ";    
+    if (solver == 0) {
+        std::cout << "Adams-Bashforth-Moulton\n";
+    } else if (solver == 1) {
+        std::cout << "Runge-Kutta 4 point\n";
+    } else {
+        std::cout << "STEPPER DOES NOT EXIST. EXITING...";
+        exit(1);            
+    }
+
+    printf("Solver range t0=%0.3f, t1=%0.3f, dt=%0.3f\n", t0, t1, dt);
+
+    std::cout << "BACKEND flow computer = ";
+    if (BACKEND_id == 0) {
+        std::cout << "uBLAS vector loops\n";
+    } else if (BACKEND_id == 1) {
+        std::cout << "TACO tensor compiler\n";
+    } else {
+        std::cout << "FLOW COMPUTER DOES NOT EXIST. EXITING...";
+        exit(1);
+    }
+        
+
+}
 
 int main(int argc, char **argv) {
     using namespace taco;
@@ -26,15 +108,14 @@ int main(int argc, char **argv) {
 
     // int nholes = 4;
     // int nparticles = 4;
-    int numStates = 10;
-    double d = 1.0;
-    double g = std::atof(argv[1]);
-    double pb = std::atof(argv[2]);
-    double t0 = std::atof(argv[3]);
-    double t1 = std::atof(argv[4]);
-    double dt = std::atof(argv[5]);
-    int solver = std::atoi(argv[6]);
-    int BACKEND_id = std::atoi(argv[7]);
+    int numStates, solver, BACKEND_id;
+    double d, g, pb, t0, t1, dt;
+
+    process_user_input(argc, argv, 
+                       numStates,
+                       d, g, pb,
+                       t0, t1, dt,
+                       solver, BACKEND_id);
 
     //int numStates = nholes + nparticles;
     vector<double> ref(numStates);
@@ -181,6 +262,8 @@ int main(int argc, char **argv) {
     //size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500);
     //size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500, sys);
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     size_t steps;
     switch (solver) {
     case 0:
@@ -192,6 +275,13 @@ int main(int argc, char **argv) {
     default:
         steps = integrate_adaptive(abm_stepper, sys, y0, t0, t1, dt, sys);        
     }
+
+    auto stop = std::chrono::high_resolution_clock::now();
+
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    
+    std::cout << "\nDone " << duration.count() << " microseconds" << std::endl;
+    
 
     //delete observer;
 

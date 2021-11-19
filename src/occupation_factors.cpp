@@ -11,6 +11,10 @@ OccupationFactors::OccupationFactors(int numStates, vector<double> ref)
     this->numStates = numStates;
     this->ref = ref;
 
+    std::stringstream temp_stream;
+    temp_stream << "OCC" << std::to_string(numStates) << "/";
+    path = temp_stream.str();
+
     const char* path_char = &path[0];
     int check = mkdir(path_char, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 

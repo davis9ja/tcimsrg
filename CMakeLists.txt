@@ -15,5 +15,5 @@ find_package(OpenMP REQUIRED)
 # add the executable
 include_directories(/mnt/home/daviso53/taco/include ${PROJECT_DIR}/include)
 file(GLOB SOURCES ${PROJECT_DIR}/src/*.cpp)
-add_executable(main ${SOURCES})
-target_link_libraries(main /mnt/home/daviso53/taco/build/lib/libtaco.so OpenMP::OpenMP_CXX)
+add_executable(solve_imsrg ${SOURCES})
+target_link_libraries(solve_imsrg /mnt/home/daviso53/taco/build/lib/libtaco.so OpenMP::OpenMP_CXX)

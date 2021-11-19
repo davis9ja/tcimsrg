@@ -184,7 +184,7 @@ void System::operator()( const state_type &x , double t )
     vector<double> eta1b, eta2b;
 
     if (t == 0.0)
-        printf("%-4s\t%-8s\t%-8s\t%-8s\n", "t", "E", "||eta1b||", "||eta2b||");
+        printf("\n%-4s\t%-8s\t%-8s\t%-8s\n", "t", "E", "||eta1b||", "||eta2b||");
 
     vector2system(x, f.size(), E, f, Gamma);
 

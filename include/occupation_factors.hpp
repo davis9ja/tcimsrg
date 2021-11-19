@@ -4,6 +4,7 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sstream>
 
 #include "taco.h"
 #include "imsrg_utils.hpp"
@@ -23,7 +24,8 @@ private:
     void writeC();
     void writeD();
 
-    std::string path = "occ_storage/";
+    std::string path;
+
 
 public:
     
