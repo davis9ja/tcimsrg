@@ -5,6 +5,8 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <math.h>
 #include <omp.h>
+#include <iostream>
+#include <fstream>
 
 #include "taco.h"
 #include "white.hpp"
@@ -20,6 +22,9 @@ private:
 
     double dE;
     boost::numeric::ublas::vector<double> df, dGamma;
+
+    std::vector<state_type> data_log;
+    std::ofstream *out_file;
 
     //SystemObserver *observer;
 
@@ -39,8 +44,10 @@ public:
     System(int numStates,
            double &E, boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W,
            White *white, 
-           Flow_IMSRG2 *flow
+           Flow_IMSRG2 *flow,
+           std::ofstream *out_file
            );
+    ~System();
 
     void system2vector(double &E, 
                        boost::numeric::ublas::vector<double> &f,
@@ -52,12 +59,15 @@ public:
                        boost::numeric::ublas::vector<double> &f,
                        boost::numeric::ublas::vector<double> &Gamma);
 
-    void reinitSystem(state_type x);
+    // void reinitSystem(state_type x);
     void operator() (const state_type &x, state_type &dxdt, const double t);
-    void write_step();
+    // void write_step();
 
     void operator()(const state_type &x , double t);
-    
+
+    std::vector<state_type> getFlowData() {
+        return data_log;
+    }
 };
 
 

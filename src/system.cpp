@@ -6,7 +6,7 @@ using namespace boost::numeric::ublas;
 
 System::System(int numStates,
                double &E, vector<double> &f, vector<double> &Gamma, vector<double> &W,
-               White *white, Flow_IMSRG2 *flow) {
+               White *white, Flow_IMSRG2 *flow, std::ofstream *out_file_in) {
 
     int fSize = numStates*numStates;
     int GammaSize = fSize*fSize;
@@ -18,6 +18,8 @@ System::System(int numStates,
     this->W = W;
     this->white = white;
     this->flow = flow;
+    out_file = out_file_in;
+
     //this->observer = observer->getInstance();
     
     //this->sys_vec = vector<double>(1+fSize+GammaSize);
@@ -31,6 +33,20 @@ System::System(int numStates,
     //system2vector();
 
     //printf("%8s\t%10s\t%10s\t%10s\n", "s", "E", "||eta1b||", "||eta2b||");
+}
+
+System::~System() {
+    if ((*out_file).is_open()) {
+        for (int i = 0; i < data_log.size(); i++) {
+            state_type x = data_log[i];
+
+            //*out_file << t << ',';
+            for (int j = 0; j < x.size(); j++)
+                *out_file << x[j] << ',';
+            *out_file << "\n";
+
+        }
+    }
 }
 
 void System::system2vector(double &E, vector<double> &f, vector<double> &Gamma, state_type &x) {
@@ -100,24 +116,24 @@ void System::vector2system(const state_type &x, int fSize, double &E, vector<dou
 
 }
 
-void System::reinitSystem(state_type x) {
+// void System::reinitSystem(state_type x) {
     
-    this->E = x[0];
+//     this->E = x[0];
 
-    // double* fArr = (double*)this->f.getStorage().getValues().getData();
-    // double* GammaArr = (double*)this->Gamma.getStorage().getValues().getData();
-    int fSize = numStates*numStates;
-    int GammaSize = fSize*fSize;
+//     // double* fArr = (double*)this->f.getStorage().getValues().getData();
+//     // double* GammaArr = (double*)this->Gamma.getStorage().getValues().getData();
+//     int fSize = numStates*numStates;
+//     int GammaSize = fSize*fSize;
 
-    //#pragma omp parallel for
-    for(int i = 1; i < fSize+1; i++)
-        this->f[i-1] = x[i];
-    //std::cout << "done 1b" << std::endl;
-    //#pragma omp parallel for
-    for(int i = fSize+1; i < GammaSize+1; i++)
-        this->Gamma[i-fSize-1] = x[i];
-    //std::cout << "done 2b" << std::endl;
-}
+//     //#pragma omp parallel for
+//     for(int i = 1; i < fSize+1; i++)
+//         this->f[i-1] = x[i];
+//     //std::cout << "done 1b" << std::endl;
+//     //#pragma omp parallel for
+//     for(int i = fSize+1; i < GammaSize+1; i++)
+//         this->Gamma[i-fSize-1] = x[i];
+//     //std::cout << "done 2b" << std::endl;
+// }
 
 void System::operator() (const state_type &x, state_type &dxdt, const double t) {
     //std::cout << "BEFORE, " << x[0] << std::endl;
@@ -173,6 +189,7 @@ void System::operator() (const state_type &x, state_type &dxdt, const double t) 
     //     cout << sys_vec[i] << endl;
 
     //printf("%8s\t%10s\t%10s\t%10s\n", t, x[0], this->eta1b_norm, this->eta2b_norm);
+
 }
 
 void System::operator()( const state_type &x , double t )
@@ -205,4 +222,13 @@ void System::operator()( const state_type &x , double t )
 
 
     printf("%0.4f\t%0.8f\t%0.8f\t%0.8f\n", t, x[0], eta1b_norm, eta2b_norm);
+
+    data_log.push_back(x);
+    // if ((*out_file).is_open()) {
+    //     *out_file << t << ',';
+    //     for (int j = 0; j < x.size(); j++)
+    //         *out_file << x[j] << ',';
+    //     *out_file << "\n";
+    // }
+    
 }

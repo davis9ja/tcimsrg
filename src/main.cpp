@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <ctime>
 #include <boost/numeric/odeint.hpp>
+#include <boost/format.hpp>
 #include <chrono>
+#include <iostream>
+#include <fstream>
 
 #include "taco.h"
 #include "pairinghamiltonian.hpp"
@@ -97,6 +100,24 @@ void process_user_input(int argc, char **argv,
 
 }
 
+void write_log(std::string file_path, std::vector<state_type> data) {
+
+    std::ofstream out_file(file_path);
+    if (out_file.is_open()) {
+        for (int i = 0; i < data.size(); i++) {
+            state_type x = data[i];
+            
+            for (int j = 0; j < x.size(); j++)
+                out_file << x[j] << ',';
+
+            out_file << '\n';
+        }
+
+        out_file.close();
+    }
+
+}
+
 int main(int argc, char **argv) {
     using namespace taco;
     using namespace boost::numeric::odeint;
@@ -127,6 +148,8 @@ int main(int argc, char **argv) {
         //ref.insert({p}, val);
         ref[p] = val;
     }
+
+    std::cout << "Reference state = " << ref << std::endl;
     //ref.pack();
 
     OccupationFactors occ(numStates, ref);
@@ -254,7 +277,38 @@ int main(int argc, char **argv) {
     //static SystemObserver *observer; //= observer.getInstance(); //new SystemObserver(x_vec, times);
     //SystemObserver *observer = observer->getInstance();
 
-    System sys(numStates, E, f, Gamma, W, &white, &flow );
+    std::string log_dir = "./flow/";
+    const char* path_char = &log_dir[0];
+    int check = mkdir(path_char, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+
+    if (check == -1) {
+        std::cout << "Log dir already exists at ./flow/" << std::endl;
+    }
+
+    std::string log_path = "./flow/H";
+    boost::format fmt = boost::format("%02d-%0.2f-%0.2f-%0.2f-%0.2f-%0.2f-%0.2f")%numStates%d%g%pb%t0%t1%dt;
+    log_path += fmt.str();
+    // log_path += std::to_string(numStates);
+    // log_path += "-"+std::to_string(d);
+    // log_path += "-"+std::to_string(g);
+    // log_path += "-"+std::to_string(pb);
+    // log_path += "-"+std::to_string(t0);
+    // log_path += "-"+std::to_string(t1);
+    // log_path += "-"+std::to_string(dt);
+    log_path += ".log";
+    std::cout << "Writing flow data log to " << log_path << std::endl;
+
+    std::ofstream out_file(log_path);
+
+    out_file << "numStates," << numStates << std::endl;
+    out_file << "d," << d << std::endl;
+    out_file << "g," << g << std::endl;
+    out_file << "pb," << pb << std::endl;
+    out_file << "t0," << t0 << std::endl;
+    out_file << "t1," << t1 << std::endl;
+    out_file << "dt," << dt << std::endl;
+
+    System sys(numStates, E, f, Gamma, W, &white, &flow, &out_file);
     state_type y0(1+f.size()+Gamma.size());
 
     sys.system2vector(E, f, Gamma, y0);
@@ -281,7 +335,13 @@ int main(int argc, char **argv) {
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     
     std::cout << "\nDone " << duration.count() << " microseconds" << std::endl;
+
+    out_file << "elapsed," << duration.count() << std::endl;
+
+    out_file.close();
     
+    //std::cout << sys.getFlowData() << std::endl;
+    //write_log(log_path, sys.getFlowData());
 
     //delete observer;
 
