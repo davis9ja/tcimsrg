@@ -8,6 +8,7 @@
 #include <fstream>
 
 #include "taco.h"
+#include "dmcpp.hpp"
 #include "pairinghamiltonian.hpp"
 #include "occupation_factors.hpp"
 #include "white.hpp"
@@ -138,15 +139,35 @@ int main(int argc, char **argv) {
                        t0, t1, dt,
                        solver, BACKEND_id);
 
+    vector<double> weights(36);
+    // weights[0] = sqrt(0.8);
+    // weights[1] = sqrt(0.2);
+    for (int i = 0; i < 36; i++) {
+        if (i == 0)
+            weights[i] = sqrt(0.9);
+        else if (i == 1)
+            weights[i] = sqrt(0.1);
+        else
+            weights[i] = 0.0;
+    }
+
+    vector<double> rho1b = density_1b(4,4,weights, "sd8.basis");
+    vector<double> rho2b = density_2b(4,4,weights, "sd8.basis");
+
     //int numStates = nholes + nparticles;
     vector<double> ref(numStates);
     
+    int idx;
     double val = 0.0;
     for (int p = 0; p < numStates; p++) {
-        val = (p < (int)numStates/2) ? 1.0 : 0.0;
-        //printf("%0.2f\n",val);
-        //ref.insert({p}, val);
-        ref[p] = val;
+
+        idx = p*numStates +p;
+        ref[p] = rho1b[idx];
+
+        // val = (p < (int)numStates/2) ? 1.0 : 0.0;
+        // //printf("%0.2f\n",val);
+        // //ref.insert({p}, val);
+        // ref[p] = val;
     }
 
     std::cout << "Reference state = " << ref << std::endl;
@@ -172,7 +193,7 @@ int main(int argc, char **argv) {
     }
 
     White white(numStates, ref);
-    PairingHamiltonian H(numStates, ref, d,g,pb);
+    PairingHamiltonian H(numStates, rho1b, rho2b, d,g,pb);
     Flow_IMSRG2 flow(occ, backend);
 
     double E = H.get_E();

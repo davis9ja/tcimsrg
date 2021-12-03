@@ -5,7 +5,7 @@
 
 using namespace taco;
 using namespace boost::numeric::ublas;
-PairingHamiltonian::PairingHamiltonian(int numStates, vector<double> ref, double d, double g, double pb) 
+PairingHamiltonian::PairingHamiltonian(int numStates, vector<double> rho1b, vector<double> rho2b, double d, double g, double pb) 
 {
     this->d = d;
     this->g = g;
@@ -104,18 +104,20 @@ PairingHamiltonian::PairingHamiltonian(int numStates, vector<double> ref, double
     // CANNOT use TACO to trace over indices of same tensor (why not?)
 
     //Tensor<double> Gamma_piqi("Gamma_piqi", {numStates, numStates}, {Dense, Dense});
-    vector<double> Gamma_piqi(numStates*numStates);
+    //vector<double> Gamma_piqi(numStates*numStates);
 
-    int idxGamma, idxf;
+    int idxGamma, idxf, idxRho1b;
     // double Gamma_val = 0.0;
     // double ref_val = 0.0;
     for (int p = 0; p < numStates; p++) {
         for (int q = 0; q < numStates; q++) {
             double sum = 0.0;
             for (int i = 0; i < numStates; i++) {
-                idxGamma = p*numStates*numStates*numStates + i*numStates*numStates + q*numStates + i;
-
-                sum += Gamma[idxGamma]*ref[i];
+                for (int j = 0; j < numStates; j++) {
+                    idxGamma = p*numStates*numStates*numStates + i*numStates*numStates + q*numStates + j;
+                    idxRho1b = i*numStates + j;
+                    sum += Gamma[idxGamma]*rho1b[idxRho1b];
+                }
             }
             //Gamma_piqi.insert({p,q}, sum);
             //Gamma_piqi[p,q] += sum;
@@ -139,21 +141,28 @@ PairingHamiltonian::PairingHamiltonian(int numStates, vector<double> ref, double
     // Need to trace over 1B and 2B operators
     
     //One body trace
-    double h1b_ii = 0.0;
-    for (int i = 0; i < numStates; i++) {
-        h1b_ii += H1B[i*numStates+i]*ref[i];     
-    }
-
-    double Gamma_ijij = 0.0;
+    double h1b_ij = 0.0;
     for (int i = 0; i < numStates; i++) {
         for (int j = 0; j < numStates; j++) {
-            idxGamma = i*numStates*numStates*numStates + j*numStates*numStates + i*numStates + j;
-            Gamma_ijij += Gamma[idxGamma]*ref[i]*ref[j];
+            idx1b = i*numStates+j;
+            h1b_ij += H1B[idx1b]*rho1b[idx1b];     
+        }
+    }
+
+    double Gamma_ijkl = 0.0;
+    for (int i = 0; i < numStates; i++) {
+        for (int j = 0; j < numStates; j++) {
+            for (int k = 0; k < numStates; k++) {
+                for (int l = 0; l < numStates; l++) {
+                    idxGamma = i*numStates*numStates*numStates + j*numStates*numStates + k*numStates + l;
+                    Gamma_ijkl += Gamma[idxGamma]*rho2b[idxGamma];
+                }
+            }
         }
     }
     //std::cout << "Gamma_ijij, " << Gamma_ijij << std::endl;
     
-    E = h1b_ii + 0.5*Gamma_ijij;//double E_val = h1b_ii + 0.5*Gamma_ijij;
+    E = h1b_ij + 0.25*Gamma_ijkl;//double E_val = h1b_ii + 0.5*Gamma_ijij;
 
     // E = Tensor<double>(E_val);
     // E.pack();

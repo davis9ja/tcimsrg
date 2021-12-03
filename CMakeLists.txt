@@ -13,7 +13,7 @@ project("imsrg" LANGUAGES CXX)
 find_package(OpenMP REQUIRED)
 
 # add the executable
-include_directories(/mnt/home/daviso53/taco/include ${PROJECT_DIR}/include)
+include_directories(/mnt/home/daviso53/taco/include ${PROJECT_DIR}/include /mnt/home/daviso53/Research/dmcpp/)
 file(GLOB SOURCES ${PROJECT_DIR}/src/*.cpp)
 add_executable(solve_imsrg ${SOURCES})
-target_link_libraries(solve_imsrg /mnt/home/daviso53/taco/build/lib/libtaco.so OpenMP::OpenMP_CXX)
+target_link_libraries(solve_imsrg /mnt/home/daviso53/taco/build/lib/libtaco.so OpenMP::OpenMP_CXX /mnt/home/daviso53/Research/dmcpp/libdmc.a)

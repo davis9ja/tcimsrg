@@ -39,7 +39,7 @@ public:
 
     int numStates;
 
-    PairingHamiltonian(int numStates, boost::numeric::ublas::vector<double> ref, double d, double g, double pb);
+    PairingHamiltonian(int numStates, boost::numeric::ublas::vector<double> rho1b, boost::numeric::ublas::vector<double> rho2b, double d, double g, double pb);
     //~PairingHamiltonian();
 
     double getSpacing() { return d; }
