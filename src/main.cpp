@@ -125,34 +125,55 @@ int main(int argc, char **argv) {
     using namespace boost::numeric::ublas;
     adams_bashforth_moulton<5, state_type> abm_stepper;
     runge_kutta4<state_type> rk_stepper;
-
+    std::string basis_path;
+    int numWeights;
     //using namespace std;
 
     // int nholes = 4;
     // int nparticles = 4;
     int numStates, solver, BACKEND_id;
     double d, g, pb, t0, t1, dt;
-
+    
     process_user_input(argc, argv, 
                        numStates,
                        d, g, pb,
                        t0, t1, dt,
                        solver, BACKEND_id);
 
-    vector<double> weights(36);
+    basis_path = "sd"+std::to_string(numStates)+".basis";
+
+    std::ifstream in_file(basis_path);
+
+    if (in_file.good()) {
+        size_t pos = 0;
+        std::string line;
+        std::getline(in_file, line);
+
+        std::string delim = " ";
+        std::string token;
+
+        pos = line.find(delim);
+        token = line.substr(0, pos);
+        line.erase(0, pos + delim.length());
+        numWeights = std::stoi(line);
+
+    }
+        
+    vector<double> weights(numWeights);
     // weights[0] = sqrt(0.8);
     // weights[1] = sqrt(0.2);
-    for (int i = 0; i < 36; i++) {
+    for (int i = 0; i < numWeights; i++) {
         if (i == 0)
-            weights[i] = sqrt(0.9);
+            weights[i] = sqrt(1.0);
         else if (i == 1)
-            weights[i] = sqrt(0.1);
+            weights[i] = sqrt(0.0);
         else
             weights[i] = 0.0;
     }
+    
 
-    vector<double> rho1b = density_1b(4,4,weights, "sd8.basis");
-    vector<double> rho2b = density_2b(4,4,weights, "sd8.basis");
+    vector<double> rho1b = density_1b((int)numStates/2,(int)numStates/2,weights, basis_path);
+    vector<double> rho2b = density_2b((int)numStates/2,(int)numStates/2,weights, basis_path);
 
     //int numStates = nholes + nparticles;
     vector<double> ref(numStates);
@@ -329,7 +350,7 @@ int main(int argc, char **argv) {
     out_file << "t1," << t1 << std::endl;
     out_file << "dt," << dt << std::endl;
 
-    System sys(numStates, E, f, Gamma, W, &white, &flow, &out_file);
+    System sys(numStates, rho1b, rho2b, E, f, Gamma, W, &white, &flow, &out_file);
     state_type y0(1+f.size()+Gamma.size());
 
     sys.system2vector(E, f, Gamma, y0);

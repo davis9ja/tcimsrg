@@ -4,7 +4,7 @@ using namespace taco;
 using namespace boost::numeric::ublas;
 //using namespace std;
 
-System::System(int numStates,
+System::System(int numStates, vector<double> &rho1b, vector<double> &rho2b,
                double &E, vector<double> &f, vector<double> &Gamma, vector<double> &W,
                White *white, Flow_IMSRG2 *flow, std::ofstream *out_file_in) {
 
@@ -12,6 +12,8 @@ System::System(int numStates,
     int GammaSize = fSize*fSize;
 
     this->numStates = numStates;
+    this->rho1b = rho1b;
+    this->rho2b = rho2b;
     this->E = E;
     this->f = f;
     this->Gamma = Gamma;
@@ -36,17 +38,74 @@ System::System(int numStates,
 }
 
 System::~System() {
+
+    int size1b = numStates*numStates;
+    int size2b = numStates*numStates*numStates*numStates;
+    double h0b;
+    vector<double> h1b(size1b);
+    vector<double> h2b(size2b);
+
+    double E;
+    vector<double> f(size1b);
+    vector<double> Gamma(size2b);
+
     if ((*out_file).is_open()) {
         for (int i = 0; i < data_log.size(); i++) {
             state_type x = data_log[i];
+            
+            E = x[0];
+            
+            for (int i = 1; i < size1b+1; i++)
+                f[i-1] = x[i];
+
+            for (int i = 1+size1b; i < size2b+1; i++)
+                Gamma[i-size1b-1] = x[i];
+
+            for (int i = 0; i < Gamma.size(); i++)
+                h2b[i] = Gamma[i];
+            
+            for (int p = 0; p < numStates; p++) {
+                for (int q = 0; q < numStates; q++) {
+
+                    double sum = 0.0;
+                    for (int i = 0; i < numStates; i++)
+                        for (int j = 0; j < numStates; j++)
+                            sum += Gamma[p*numStates*numStates*numStates + i*numStates*numStates + q*numStates + j]*rho1b[i*numStates+j];
+                    
+                    h1b[p*numStates+q] = f[p*numStates+q] - sum;
+                }
+            }
+
+            double h1b_ij = 0.0;
+            for (int i = 0; i < numStates; i++)
+                for (int j = 0; j < numStates; j++)
+                    h1b_ij += h1b[i*numStates+j]*rho1b[i*numStates+j];
+
+            double h2b_ijkl = 0.0;
+            for (int i = 0; i < numStates; i++)
+                for (int j = 0; j < numStates; j++)
+                    for (int k = 0; k < numStates; k++)
+                        for (int l = 0; l < numStates; l++)
+                            h2b_ijkl += h2b[i*numStates*numStates*numStates + j*numStates*numStates + k*numStates + l]*rho2b[i*numStates*numStates*numStates + j*numStates*numStates + k*numStates + l];
+
+            h0b = E - h1b_ij - 0.25*h2b_ijkl;
 
             //*out_file << t << ',';
+
             for (int j = 0; j < x.size(); j++)
                 *out_file << x[j] << ',';
+            
+            // *out_file << h0b << ',';
+            // for (int i = 0; i < h1b.size(); i++)
+            //     *out_file << h1b[i] << ',';
+            // for (int i = 0; i < h2b.size(); i++)
+            //     *out_file << h2b[i] << ',';
+            
             *out_file << "\n";
 
         }
     }
+    
 }
 
 void System::system2vector(double &E, vector<double> &f, vector<double> &Gamma, state_type &x) {
