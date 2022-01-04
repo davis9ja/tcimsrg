@@ -12,13 +12,17 @@ Tensor Algebra Compiler code at [https://github.com/tensor-compiler/taco]()
 
 ### TODO:
 
-- [ ] Make SystemObserver a singleton class
-  - necessary to reconcile flow data across all systems
-- [ ] Implement TACO backend
+- [x] Implement TACO backend
   - pass occupation tensors directly so no conversion?
-- [ ] Add density matrix normal-ordering functionality
-- [ ] Remove particle-hole distinction
+- [x] Add density matrix normal-ordering functionality
+  - [ ] optimize density matrix normal-ordering
+    - DMCPP code is way too slow
+- [x] Remove particle-hole distinction
   - This makes density matrix process simpler
+- [ ] Come up with user input to specify density matrix weights
+- [ ] Come up with user input to specify reference state type (single ref, or ensemble)
+- [ ] Optimize loops and parallelize TACO code
+
 
 ## Purpose
 Build system for solving the pairing-plus-particle-hole model Hamiltonian using IMSRG(2). 
