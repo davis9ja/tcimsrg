@@ -24,7 +24,7 @@ private:
     boost::numeric::ublas::vector<double> df, dGamma;
 
     std::vector<state_type> data_log;
-    std::ofstream *out_file;
+    std::ofstream *out_file_vac, *out_file_imsrg;
 
     boost::numeric::ublas::vector<double> rho1b, rho2b;
 
@@ -47,7 +47,8 @@ public:
            double &E, boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W,
            White *white, 
            Flow_IMSRG2 *flow,
-           std::ofstream *out_file
+           std::ofstream *out_file_vac,
+           std::ofstream *out_file_imsrg
            );
     ~System();
 

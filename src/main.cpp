@@ -338,19 +338,32 @@ int main(int argc, char **argv) {
     // log_path += "-"+std::to_string(t1);
     // log_path += "-"+std::to_string(dt);
     log_path += ".log";
-    std::cout << "Writing flow data log to " << log_path << std::endl;
+    std::cout << "Writing vacuum coefficient flow data log to " << log_path << std::endl;
+    std::ofstream out_file_vac(log_path); 
 
-    std::ofstream out_file(log_path);
+    log_path += ".imsrg";
+    std::cout << "Writing IMSRG coefficient flow data log to " << log_path << std::endl;
+    std::ofstream out_file_imsrg(log_path); 
 
-    out_file << "numStates," << numStates << std::endl;
-    out_file << "d," << d << std::endl;
-    out_file << "g," << g << std::endl;
-    out_file << "pb," << pb << std::endl;
-    out_file << "t0," << t0 << std::endl;
-    out_file << "t1," << t1 << std::endl;
-    out_file << "dt," << dt << std::endl;
 
-    System sys(numStates, rho1b, rho2b, E, f, Gamma, W, &white, &flow, &out_file);
+    out_file_vac << "numStates," << numStates << std::endl;
+    out_file_vac << "d," << d << std::endl;
+    out_file_vac << "g," << g << std::endl;
+    out_file_vac << "pb," << pb << std::endl;
+    out_file_vac << "t0," << t0 << std::endl;
+    out_file_vac << "t1," << t1 << std::endl;
+    out_file_vac << "dt," << dt << std::endl;
+
+    out_file_imsrg << "numStates," << numStates << std::endl;
+    out_file_imsrg << "d," << d << std::endl;
+    out_file_imsrg << "g," << g << std::endl;
+    out_file_imsrg << "pb," << pb << std::endl;
+    out_file_imsrg << "t0," << t0 << std::endl;
+    out_file_imsrg << "t1," << t1 << std::endl;
+    out_file_imsrg << "dt," << dt << std::endl;
+
+
+    System sys(numStates, rho1b, rho2b, E, f, Gamma, W, &white, &flow, &out_file_vac, &out_file_imsrg);
     state_type y0(1+f.size()+Gamma.size());
 
     sys.system2vector(E, f, Gamma, y0);
@@ -378,10 +391,12 @@ int main(int argc, char **argv) {
     
     std::cout << "\nDone " << duration.count() << " microseconds" << std::endl;
 
-    out_file << "elapsed," << duration.count() << std::endl;
+    out_file_vac << "elapsed," << duration.count() << std::endl;
+    out_file_imsrg << "elapsed," << duration.count() << std::endl;
 
-    out_file.close();
-    
+    out_file_vac.close();
+    out_file_imsrg.close();    
+
     //std::cout << sys.getFlowData() << std::endl;
     //write_log(log_path, sys.getFlowData());
 

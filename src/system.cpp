@@ -6,7 +6,7 @@ using namespace boost::numeric::ublas;
 
 System::System(int numStates, vector<double> &rho1b, vector<double> &rho2b,
                double &E, vector<double> &f, vector<double> &Gamma, vector<double> &W,
-               White *white, Flow_IMSRG2 *flow, std::ofstream *out_file_in) {
+               White *white, Flow_IMSRG2 *flow, std::ofstream *out_file_vac_in, std::ofstream *out_file_imsrg_in) {
 
     int fSize = numStates*numStates;
     int GammaSize = fSize*fSize;
@@ -20,7 +20,8 @@ System::System(int numStates, vector<double> &rho1b, vector<double> &rho2b,
     this->W = W;
     this->white = white;
     this->flow = flow;
-    out_file = out_file_in;
+    out_file_vac = out_file_vac_in;
+    out_file_imsrg = out_file_imsrg_in;
 
     //this->observer = observer->getInstance();
     
@@ -49,7 +50,7 @@ System::~System() {
     vector<double> f(size1b);
     vector<double> Gamma(size2b);
 
-    if ((*out_file).is_open()) {
+    if ((*out_file_vac).is_open()) {
         for (int i = 0; i < data_log.size(); i++) {
             state_type x = data_log[i];
             
@@ -91,18 +92,27 @@ System::~System() {
             h0b = E - h1b_ij - 0.25*h2b_ijkl;
 
             //*out_file << t << ',';
+            
+            *out_file_vac << h0b << ',';
+            for (int i = 0; i < h1b.size(); i++)
+                *out_file_vac << h1b[i] << ',';
+            for (int i = 0; i < h2b.size(); i++)
+                *out_file_vac << h2b[i] << ',';
+            
+            *out_file_vac << "\n";
+
+        }
+    }
+
+    if((*out_file_imsrg).is_open()) {
+
+        for (int i = 0; i < data_log.size(); i++) {
+            state_type x = data_log[i];
 
             for (int j = 0; j < x.size(); j++)
-                *out_file << x[j] << ',';
-            
-            // *out_file << h0b << ',';
-            // for (int i = 0; i < h1b.size(); i++)
-            //     *out_file << h1b[i] << ',';
-            // for (int i = 0; i < h2b.size(); i++)
-            //     *out_file << h2b[i] << ',';
-            
-            *out_file << "\n";
+                *out_file_imsrg << x[j] << ',';
 
+            *out_file_imsrg << "\n";
         }
     }
     
