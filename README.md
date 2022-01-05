@@ -22,7 +22,7 @@ Tensor Algebra Compiler code at [https://github.com/tensor-compiler/taco]()
 - [ ] Come up with user input to specify density matrix weights
 - [ ] Come up with user input to specify reference state type (single ref, or ensemble)
 - [ ] Optimize loops and parallelize TACO code
-- [ ] Overhaul the system logging
+- [x] Overhaul the system logging
   - want two files: IMSRG coefficients and vacuum coefficients (including s vals and ||eta1b||, ||eta2b||)
 
 ## Purpose
