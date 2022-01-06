@@ -24,6 +24,8 @@ Tensor Algebra Compiler code at [https://github.com/tensor-compiler/taco]()
 - [ ] Optimize loops and parallelize TACO code
 - [x] Overhaul the system logging
   - want two files: IMSRG coefficients and vacuum coefficients (including s vals and ||eta1b||, ||eta2b||)
+- [ ] Add White Atan generator
+  - seems to work better for floating point reference states, without including irreducible DMs in flow equations (should investigate this)
 
 ## Purpose
 Build system for solving the pairing-plus-particle-hole model Hamiltonian using IMSRG(2). 
