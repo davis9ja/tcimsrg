@@ -6,7 +6,7 @@ using namespace boost::numeric::ublas;
 
 System::System(int numStates, vector<double> &rho1b, vector<double> &rho2b,
                double &E, vector<double> &f, vector<double> &Gamma, vector<double> &W,
-               White *white, Flow_IMSRG2 *flow, std::ofstream *out_file_vac_in, std::ofstream *out_file_imsrg_in) {
+               Generator *generator, Flow_IMSRG2 *flow, std::ofstream *out_file_vac_in, std::ofstream *out_file_imsrg_in) {
 
     int fSize = numStates*numStates;
     int GammaSize = fSize*fSize;
@@ -18,7 +18,7 @@ System::System(int numStates, vector<double> &rho1b, vector<double> &rho2b,
     this->f = f;
     this->Gamma = Gamma;
     this->W = W;
-    this->white = white;
+    this->generator = generator;
     this->flow = flow;
     out_file_vac = out_file_vac_in;
     out_file_imsrg = out_file_imsrg_in;
@@ -227,8 +227,8 @@ void System::operator() (const state_type &x, state_type &dxdt, const double t) 
     vector2system(x, f.size(), E, f, Gamma);
 
     // Compute generator from state
-    vector<double> eta1b = (*white).compute_1b(f, Gamma, W);
-    vector<double> eta2b = (*white).compute_2b(f, Gamma, W);
+    vector<double> eta1b = (*generator).compute_1b(f, Gamma, W);
+    vector<double> eta2b = (*generator).compute_2b(f, Gamma, W);
 
     // Flow E, f, Gamma
     dE = (*flow).flow_0b(f, Gamma, eta1b, eta2b);
@@ -275,8 +275,8 @@ void System::operator()( const state_type &x , double t )
     vector2system(x, f.size(), E, f, Gamma);
 
     // Compute generator from state
-    eta1b = (*white).compute_1b(f, Gamma, W);
-    eta2b = (*white).compute_2b(f, Gamma, W);
+    eta1b = (*generator).compute_1b(f, Gamma, W);
+    eta2b = (*generator).compute_2b(f, Gamma, W);
 
     norm = 0.0;
     for (int i = 0; i < eta1b.size(); i++)

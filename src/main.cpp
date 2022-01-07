@@ -11,9 +11,11 @@
 #include "dmcpp.hpp"
 #include "pairinghamiltonian.hpp"
 #include "occupation_factors.hpp"
-#include "white.hpp"
+#include "generator.hpp"
 #include "flow_imsrg2.hpp"
 #include "system.hpp"
+
+#include "white.cpp"
 #include "BACKEND_ublas.cpp"
 #include "BACKEND_taco.cpp"
 //#include "derivative.hpp"
@@ -213,7 +215,11 @@ int main(int argc, char **argv) {
         backend = &cb_ublas;
     }
 
+    Generator *generator;
     White white(numStates, ref);
+
+    generator = &white;
+
     PairingHamiltonian H(numStates, rho1b, rho2b, d,g,pb);
     Flow_IMSRG2 flow(occ, backend);
 
@@ -363,7 +369,7 @@ int main(int argc, char **argv) {
     out_file_imsrg << "dt," << dt << std::endl;
 
 
-    System sys(numStates, rho1b, rho2b, E, f, Gamma, W, &white, &flow, &out_file_vac, &out_file_imsrg);
+    System sys(numStates, rho1b, rho2b, E, f, Gamma, W, generator, &flow, &out_file_vac, &out_file_imsrg);
     state_type y0(1+f.size()+Gamma.size());
 
     sys.system2vector(E, f, Gamma, y0);

@@ -12,8 +12,7 @@ public:
     boost::numeric::ublas::vector<double> eta2b;
     boost::numeric::ublas::vector<double> eta3b;
     
-    int n_holes;
-    int n_particles;
+    int numStates;
 
     virtual boost::numeric::ublas::vector<double> compute_1b(boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W) = 0;
     virtual boost::numeric::ublas::vector<double> compute_2b(boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W) = 0;

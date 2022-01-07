@@ -9,7 +9,7 @@
 #include <fstream>
 
 #include "taco.h"
-#include "white.hpp"
+#include "generator.hpp"
 #include "flow_imsrg2.hpp"
 #include "state_type.hpp"
 
@@ -36,7 +36,7 @@ public:
     double E;
     boost::numeric::ublas::vector<double> f, Gamma, W;
     //state_type sys_vec;
-    White *white;
+    Generator *generator;
     Flow_IMSRG2 *flow;
 
 
@@ -45,7 +45,7 @@ public:
 
     System(int numStates, boost::numeric::ublas::vector<double> &rho1b, boost::numeric::ublas::vector<double> &rho2b,
            double &E, boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W,
-           White *white, 
+           Generator *generator, 
            Flow_IMSRG2 *flow,
            std::ofstream *out_file_vac,
            std::ofstream *out_file_imsrg
