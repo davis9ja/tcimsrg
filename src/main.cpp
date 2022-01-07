@@ -16,6 +16,7 @@
 #include "system.hpp"
 
 #include "white.cpp"
+#include "white_atan.cpp"
 #include "BACKEND_ublas.cpp"
 #include "BACKEND_taco.cpp"
 //#include "derivative.hpp"
@@ -217,8 +218,9 @@ int main(int argc, char **argv) {
 
     Generator *generator;
     White white(numStates, ref);
+    WhiteAtan whiteAtan(numStates, ref);
 
-    generator = &white;
+    generator = &whiteAtan;
 
     PairingHamiltonian H(numStates, rho1b, rho2b, d,g,pb);
     Flow_IMSRG2 flow(occ, backend);
