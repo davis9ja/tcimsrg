@@ -20,12 +20,14 @@ Tensor Algebra Compiler code at [https://github.com/tensor-compiler/taco]()
 - [x] Remove particle-hole distinction
   - This makes density matrix process simpler
 - [ ] Come up with user input to specify density matrix weights
-- [ ] Come up with user input to specify reference state type (single ref, or ensemble)
+- [x] Come up with user input to specify reference state type (single ref, or ensemble)
 - [ ] Optimize loops and parallelize TACO code
 - [x] Overhaul the system logging
   - want two files: IMSRG coefficients and vacuum coefficients (including s vals and ||eta1b||, ||eta2b||)
 - [x] Add White Atan generator
   - seems to work better for floating point reference states, without including irreducible DMs in flow equations (should investigate this)
+- [ ] Add the multi-reference IMSRG equations
+  - the flow seems unstable for fractional density matrices without including irreducible components in flow equations
 
 ## Purpose
 Build system for solving the pairing-plus-particle-hole model Hamiltonian using IMSRG(2). 
