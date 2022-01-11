@@ -25,6 +25,8 @@ void process_user_input(int argc, char **argv,
                         int &numStates, 
                         double &d, double &g, double &pb, 
                         double &t0, double &t1, double &dt,
+                        int &generator_id,
+                        int &reference_type,
                         int &solver, int &BACKEND_id) {
 
     // SET DEFAULT PARAMS
@@ -35,6 +37,8 @@ void process_user_input(int argc, char **argv,
     t0 = 0.0;
     t1 = 5.0;
     dt = 0.1;
+    generator_id = 0;
+    reference_type = 0;
     solver = 0;
     BACKEND_id = 1;
     
@@ -67,6 +71,10 @@ void process_user_input(int argc, char **argv,
                 t1 = std::stof(param_val);
             else if (param_str == "dt")
                 dt = std::stof(param_val);
+            else if (param_str == "generator_id")
+                generator_id = std::stof(param_val);
+            else if (param_str == "reference_type")
+                reference_type = std::stof(param_val);
             else if (param_str == "solver")
                 solver = std::stof(param_val);
             else if (param_str == "BACKEND_id")
@@ -78,6 +86,16 @@ void process_user_input(int argc, char **argv,
 
 
     printf("Parameters:\n\t# s.p. states = %d\n\td=%0.3f\n\tg=%0.3f\n\tpb=%0.3f\n", numStates, d, g, pb);
+
+    std::cout << "IMSRG generator = ";
+    if (generator_id == 0) {
+        std::cout << "White\n";
+    } else if (generator_id == 1) {
+        std::cout << "White (atan)\n";
+    } else {
+        std::cout << "GENERATOR INPUT NOT RECOGNIZED. EXITING...";
+        exit(1);
+    }
 
     std::cout << "ODE Stepper = ";    
     if (solver == 0) {
@@ -134,16 +152,20 @@ int main(int argc, char **argv) {
 
     // int nholes = 4;
     // int nparticles = 4;
-    int numStates, solver, BACKEND_id;
+    int numStates, generator_id, reference_type, solver, BACKEND_id;
     double d, g, pb, t0, t1, dt;
     
     process_user_input(argc, argv, 
                        numStates,
                        d, g, pb,
                        t0, t1, dt,
+                       generator_id, reference_type,
                        solver, BACKEND_id);
 
     basis_path = "sd"+std::to_string(numStates)+".basis";
+
+    matrix<int> basis;
+    basis = readBasisFromFile(basis_path);
 
     std::ifstream in_file(basis_path);
 
@@ -167,37 +189,53 @@ int main(int argc, char **argv) {
     // weights[1] = sqrt(0.2);
     for (int i = 0; i < numWeights; i++) {
         if (i == 0)
-            weights[i] = sqrt(1.0);
+            weights[i] = (0.8);
         else if (i == 1)
-            weights[i] = sqrt(0.0);
+            weights[i] = (0.2);
         else
             weights[i] = 0.0;
     }
     
 
-    vector<double> rho1b = density_1b((int)numStates/2,(int)numStates/2,weights, basis_path);
-    vector<double> rho2b = density_2b((int)numStates/2,(int)numStates/2,weights, basis_path);
+    vector<double> rho1b = density_1b((int)numStates/2,(int)numStates/2, weights, basis_path);
+    vector<double> rho2b = density_2b((int)numStates/2,(int)numStates/2, weights, basis_path);
 
     //int numStates = nholes + nparticles;
     vector<double> ref(numStates);
-    
-    int idx;
-    double val = 0.0;
-    for (int p = 0; p < numStates; p++) {
+    vector<double> currentVec;
+    for (int i = 0; i < numWeights; i++) {
+        currentVec = matrix_row<matrix<int>>(basis, i);
+        vector_range<vector<double>> multiply_vec (currentVec, range(1,currentVec.size()));
 
-        idx = p*numStates +p;
-        ref[p] = rho1b[idx];
-
-        // val = (p < (int)numStates/2) ? 1.0 : 0.0;
-        // //printf("%0.2f\n",val);
-        // //ref.insert({p}, val);
-        // ref[p] = val;
+        ref += weights[i]*multiply_vec;
     }
+
+    // ref[0] = 1.0;
+    // ref[1] = 1.0;
+    // ref[2] = 0.8;
+    // ref[3] = 0.8;
+    // ref[4] = 0.2;
+    // ref[5] = 0.2;
+    // ref[6] = 0.0;
+    // ref[7] = 0.0;
+
+    // int idx;
+    // double val = 0.0;
+    // for (int p = 0; p < numStates; p++) {
+
+    //     idx = p*numStates +p;
+    //     ref[p] = rho1b[idx];
+
+    //     // val = (p < (int)numStates/2) ? 1.0 : 0.0;
+    //     // //printf("%0.2f\n",val);
+    //     // //ref.insert({p}, val);
+    //     // ref[p] = val;
+    // }
 
     std::cout << "Reference state = " << ref << std::endl;
     //ref.pack();
 
-    OccupationFactors occ(numStates, ref);
+    OccupationFactors occ(numStates, reference_type, ref);
 
     Backend *backend; 
     Backend_UBLAS cb_ublas(numStates, &occ);
@@ -220,7 +258,15 @@ int main(int argc, char **argv) {
     White white(numStates, ref);
     WhiteAtan whiteAtan(numStates, ref);
 
-    generator = &whiteAtan;
+    switch (generator_id) {
+    case 0:
+        generator = &white;
+        break;
+    case 1:
+        generator = &whiteAtan;
+    default:
+        generator = &white;
+    }
 
     PairingHamiltonian H(numStates, rho1b, rho2b, d,g,pb);
     Flow_IMSRG2 flow(occ, backend);
@@ -336,6 +382,13 @@ int main(int argc, char **argv) {
     }
 
     std::string log_path = "./flow/H";
+    if (reference_type == 0)
+        log_path += "S";
+    else if (reference_type == 1)
+        log_path += "E";
+    else 
+        log_path += "S";
+
     boost::format fmt = boost::format("%02d-%0.2f-%0.2f-%0.2f-%0.2f-%0.2f-%0.2f")%numStates%d%g%pb%t0%t1%dt;
     log_path += fmt.str();
     // log_path += std::to_string(numStates);

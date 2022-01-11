@@ -44,6 +44,10 @@ public:
         double nbara, ni, nbara_sq, ni_sq;
         double denom, result;
         int a, i, idxai, idxii, idxaa, idxia, idxaiai;
+        
+        // INIT ETA1B ARR
+        for (int i = 0; i < eta1b_arr.size(); i++)
+            eta1b_arr[i] = 0.;
 
         //#pragma omp parallel for private(a,i,nbara, ni, nbara_sq, ni_sq, denom, result)
         for (a = 0; a < numStates; a++) {
@@ -65,9 +69,12 @@ public:
                 else
                     result = 0.0;
             
-                if (result > 100) {
-                    std::cout << a << " " << i << " " << idxai << " " << result << " DENOM " << denom << " f[idxai]*nbara*ni " << f[idxai] << std::endl;
-                }
+                // if (result != 0.0)
+                //     std::cout << "ai " << a << i << " fai " << f[idxai] << " nbara " << nbara << " ni " << ni << " denom " << denom << std::endl;
+
+                // if (result > 100) {
+                //     std::cout << a << " " << i << " " << idxai << " " << result << " DENOM " << denom << " f[idxai]*nbara*ni " << f[idxai] << std::endl;
+                // }
 
                 //std::cout << a << "," << i << " " << result << std::endl;
                 //std::cout << result << std::endl;
@@ -110,6 +117,10 @@ public:
 
         double nbara, nbarb, ni, nj, nbara_sq, nbarb_sq, ni_sq, nj_sq;
         double denom, result;
+
+        // INIT ETA2B ARR
+        for (int i = 0; i < eta2b_arr.size(); i++)
+            eta2b_arr[i] = 0.;
     
         int a,b,i,j, idxaa, idxbb, idxii, idxjj, idxabab, idxijij, idxaiai, idxbjbj, idxajaj, idxbibi, idxabij, idxijab;
         //#pragma omp parallel for private(a,b,i,j,nbara, nbarb, ni, nj, nbara_sq, nbarb_sq, ni_sq, nj_sq, denom, result) //shared(eta2b_arr,numStates,reference,f,Gamma) private(a,b,i,j,nbara, nbarb, ni, nj, nbara_sq, nbarb_sq, ni_sq, nj_sq, denom, result)

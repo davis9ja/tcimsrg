@@ -29,7 +29,7 @@ private:
 
 public:
     
-    OccupationFactors(int numStates, boost::numeric::ublas::vector<double> ref);
+    OccupationFactors(int numStates, int refType, boost::numeric::ublas::vector<double> ref);
     std::string getPath();
     //~OccupationFactors();
 

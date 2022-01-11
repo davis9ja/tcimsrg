@@ -65,9 +65,9 @@ public:
                 else
                     result = f[idxai] * nbara*ni / denom;
             
-                if (result > 100) {
-                    std::cout << a << " " << i << " " << idxai << " " << result << " DENOM " << denom << " f[idxai]*nbara*ni " << f[idxai] << std::endl;
-                }
+                // if (result > 100) {
+                //     std::cout << a << " " << i << " " << idxai << " " << result << " DENOM " << denom << " f[idxai]*nbara*ni " << f[idxai] << std::endl;
+                // }
 
                 //std::cout << a << "," << i << " " << result << std::endl;
                 //std::cout << result << std::endl;

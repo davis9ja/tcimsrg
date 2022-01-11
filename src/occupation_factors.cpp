@@ -4,7 +4,7 @@
 using namespace taco;
 using namespace boost::numeric::ublas;
 
-OccupationFactors::OccupationFactors(int numStates, vector<double> ref)
+OccupationFactors::OccupationFactors(int numStates, int refType, vector<double> ref)
 {
     // this->n_holes = n_holes;
     // this->n_particles = n_particles;
@@ -12,7 +12,10 @@ OccupationFactors::OccupationFactors(int numStates, vector<double> ref)
     this->ref = ref;
 
     std::stringstream temp_stream;
-    temp_stream << "OCC" << std::to_string(numStates) << "/";
+    temp_stream << "OCC" << std::to_string(numStates);
+    if (refType == 1)
+        temp_stream << "_F";
+    temp_stream << "/";
     path = temp_stream.str();
 
     const char* path_char = &path[0];
