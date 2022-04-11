@@ -25,6 +25,7 @@ private:
     vector<double> occA, occB, occC, occD;
 
 public:
+    Backend_UBLAS(){}
     Backend_UBLAS(int numStates, OccupationFactors *occFact) {        
 
         std::string path = (*occFact).getPath();

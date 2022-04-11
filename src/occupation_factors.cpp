@@ -4,6 +4,8 @@
 using namespace taco;
 using namespace boost::numeric::ublas;
 
+OccupationFactors::OccupationFactors(){}
+
 OccupationFactors::OccupationFactors(int numStates, int refType, vector<double> ref)
 {
     // this->n_holes = n_holes;

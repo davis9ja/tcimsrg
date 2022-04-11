@@ -23,7 +23,7 @@ private:
     Backend *backend;
 
 public:
-
+    Flow_IMSRG2();
     Flow_IMSRG2(OccupationFactors occFact, Backend *backend);
 
     double flow_0b(boost::numeric::ublas::vector<double> &f, 

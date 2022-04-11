@@ -17,6 +17,9 @@ private:
     int delta2B(int p, int q, int r, int s);
     int deltaPB(int p, int q, int r, int s);
 
+    void normal_order_singleRef(boost::numeric::ublas::vector<int> holeIdx, boost::numeric::ublas::vector<int> particleIdx);
+    void normal_order_ensRef(boost::numeric::ublas::vector<double> rho1b, boost::numeric::ublas::vector<double> rho2b);
+
     boost::numeric::ublas::vector<double> H1B; //matrix representation of 1B operator
     boost::numeric::ublas::vector<double> H2B; //matrix representation of 2B operator
 
@@ -38,8 +41,10 @@ public:
     //boost::numeric::ublas::vector<double> ref; //= std::make_unique<int[]>(n_holes+n_particles);
 
     int numStates;
-
+    
+    PairingHamiltonian();
     PairingHamiltonian(int numStates, boost::numeric::ublas::vector<double> rho1b, boost::numeric::ublas::vector<double> rho2b, double d, double g, double pb);
+    PairingHamiltonian(int nHoles, int nParticles,  boost::numeric::ublas::vector<double> singleRef, double d, double g, double pb);
     //~PairingHamiltonian();
 
     double getSpacing() { return d; }

@@ -8,6 +8,8 @@
 using namespace taco;
 using namespace boost::numeric::ublas;
 
+Flow_IMSRG2::Flow_IMSRG2(){}
+
 Flow_IMSRG2::Flow_IMSRG2(OccupationFactors occFact, Backend *backend) {
 
 

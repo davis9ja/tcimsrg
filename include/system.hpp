@@ -3,10 +3,12 @@
 
 //#include <boost/operators.hpp>
 #include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <math.h>
 #include <omp.h>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
 #include "taco.h"
 #include "generator.hpp"
@@ -27,8 +29,10 @@ private:
     std::ofstream *out_file_vac, *out_file_imsrg;
 
     boost::numeric::ublas::vector<double> rho1b, rho2b;
-
+    boost::numeric::ublas::vector<int> holes, particles;
     //SystemObserver *observer;
+    
+    int reference_type;
 
 public:
     
@@ -39,16 +43,18 @@ public:
     Generator *generator;
     Flow_IMSRG2 *flow;
 
-
+    
     double getEta1bNorm() { return eta1b_norm; }
     double getEta2bNorm() { return eta2b_norm; }
 
+    System();
     System(int numStates, boost::numeric::ublas::vector<double> &rho1b, boost::numeric::ublas::vector<double> &rho2b,
            double &E, boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W,
            Generator *generator, 
            Flow_IMSRG2 *flow,
            std::ofstream *out_file_vac,
-           std::ofstream *out_file_imsrg
+           std::ofstream *out_file_imsrg,
+           int reference_type
            );
     ~System();
 

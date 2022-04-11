@@ -4,9 +4,13 @@ using namespace taco;
 using namespace boost::numeric::ublas;
 //using namespace std;
 
+System::System(){}
+
 System::System(int numStates, vector<double> &rho1b, vector<double> &rho2b,
                double &E, vector<double> &f, vector<double> &Gamma, vector<double> &W,
-               Generator *generator, Flow_IMSRG2 *flow, std::ofstream *out_file_vac_in, std::ofstream *out_file_imsrg_in) {
+               Generator *generator, Flow_IMSRG2 *flow, 
+               std::ofstream *out_file_vac_in, std::ofstream *out_file_imsrg_in,
+               int reference_type) {
 
     int fSize = numStates*numStates;
     int GammaSize = fSize*fSize;
@@ -22,7 +26,7 @@ System::System(int numStates, vector<double> &rho1b, vector<double> &rho2b,
     this->flow = flow;
     out_file_vac = out_file_vac_in;
     out_file_imsrg = out_file_imsrg_in;
-
+    this->reference_type = reference_type;
     //this->observer = observer->getInstance();
     
     //this->sys_vec = vector<double>(1+fSize+GammaSize);
@@ -50,7 +54,9 @@ System::~System() {
     vector<double> f(size1b);
     vector<double> Gamma(size2b);
 
-    if ((*out_file_vac).is_open()) {
+    
+
+    if ((*out_file_vac).is_open() && reference_type==1) {
         for (int i = 0; i < data_log.size(); i++) {
             state_type x = data_log[i];
             
@@ -99,7 +105,7 @@ System::~System() {
             for (int i = 0; i < h2b.size(); i++)
                 *out_file_vac << h2b[i] << ',';
             
-            *out_file_vac << "\n";
+            *out_file_vac << std::fixed << std::setprecision(13) << "\n";
 
         }
     }
@@ -112,7 +118,7 @@ System::~System() {
             for (int j = 0; j < x.size(); j++)
                 *out_file_imsrg << x[j] << ',';
 
-            *out_file_imsrg << "\n";
+            *out_file_imsrg << std::fixed << std::setprecision(13) << "\n";
         }
     }
     
@@ -228,6 +234,7 @@ void System::operator() (const state_type &x, state_type &dxdt, const double t) 
 
     // Compute generator from state
     vector<double> eta1b = (*generator).compute_1b(f, Gamma, W);
+    //std::cout << eta1b << std::endl;
     vector<double> eta2b = (*generator).compute_2b(f, Gamma, W);
 
     // Flow E, f, Gamma

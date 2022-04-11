@@ -23,6 +23,7 @@
 
 void process_user_input(int argc, char **argv, 
                         int &numStates, 
+                        int &nHoles, int &nParticles,
                         double &d, double &g, double &pb, 
                         double &t0, double &t1, double &dt,
                         int &generator_id,
@@ -31,6 +32,8 @@ void process_user_input(int argc, char **argv,
 
     // SET DEFAULT PARAMS
     numStates = 8;
+    nHoles = 4;
+    nParticles = 4;
     d = 1.0;
     g = 0.5;
     pb = 0.0;
@@ -59,6 +62,10 @@ void process_user_input(int argc, char **argv,
 
             if (param_str == "numStates")
                 numStates = std::stoi(param_val);
+            else if (param_str == "nHoles")
+                nHoles = std::stoi(param_val);
+            else if (param_str == "nParticles")
+                nParticles = std::stoi(param_val);
             else if (param_str == "d")
                 d = std::stof(param_val);
             else if (param_str == "g")
@@ -84,9 +91,17 @@ void process_user_input(int argc, char **argv,
         }
     }
 
-
-    printf("Parameters:\n\t# s.p. states = %d\n\td=%0.3f\n\tg=%0.3f\n\tpb=%0.3f\n", numStates, d, g, pb);
-
+    if (reference_type == 1)
+        printf("Parameters:\n\t# s.p. states = %d\n\td=%0.3f\n\tg=%0.3f\n\tpb=%0.3f\n", numStates, d, g, pb);
+    else if (reference_type == 0) {
+        printf("Parameters:\n\t# holes = %d\n\t# particles = %d\n\td=%0.3f\n\tg=%0.3f\n\tpb=%0.3f\n", nHoles, nParticles, d, g, pb);
+        numStates = nHoles + nParticles;
+    }
+    else {
+        std::cout << "REFERENCE TYPE NOT RECOGNIZED. EXITING...";
+        exit(1);
+    }
+        
     std::cout << "IMSRG generator = ";
     if (generator_id == 0) {
         std::cout << "White\n";
@@ -152,62 +167,112 @@ int main(int argc, char **argv) {
 
     // int nholes = 4;
     // int nparticles = 4;
-    int numStates, generator_id, reference_type, solver, BACKEND_id;
+    int numStates, nHoles, nParticles, generator_id, reference_type, solver, BACKEND_id;
     double d, g, pb, t0, t1, dt;
+
+    // for IMSRG
+    OccupationFactors occ;
+
+    Backend *backend; 
+    Backend_UBLAS cb_ublas;
+    Backend_TACO cb_taco;
+
+    Generator *generator;
+    White white;
+    WhiteAtan whiteAtan;
+
+    PairingHamiltonian H;
+    Flow_IMSRG2 flow;
+
+    double E;
+    vector<double> f, Gamma, W;
+
+    System sys;
+    state_type y0;
+
+    vector<double> ref;
     
+
+    // for Reference Ensemble
+    matrix<int> basis;
+    std::ifstream in_file;
+    vector<double> weights;
+    vector<double> rho1b, rho2b;
+    vector<double> currentVec;
+
+    // for logging
+    std::string log_dir;
+    std::ofstream out_file_vac;
+    std::ofstream out_file_imsrg;
+
     process_user_input(argc, argv, 
                        numStates,
+                       nHoles, nParticles,
                        d, g, pb,
                        t0, t1, dt,
                        generator_id, reference_type,
                        solver, BACKEND_id);
-
-    basis_path = "sd"+std::to_string(numStates)+".basis";
-
-    matrix<int> basis;
-    basis = readBasisFromFile(basis_path);
-
-    std::ifstream in_file(basis_path);
-
-    if (in_file.good()) {
-        size_t pos = 0;
-        std::string line;
-        std::getline(in_file, line);
-
-        std::string delim = " ";
-        std::string token;
-
-        pos = line.find(delim);
-        token = line.substr(0, pos);
-        line.erase(0, pos + delim.length());
-        numWeights = std::stoi(line);
-
-    }
-        
-    vector<double> weights(numWeights);
-    // weights[0] = sqrt(0.8);
-    // weights[1] = sqrt(0.2);
-    for (int i = 0; i < numWeights; i++) {
-        if (i == 0)
-            weights[i] = (0.8);
-        else if (i == 1)
-            weights[i] = (0.2);
-        else
-            weights[i] = 0.0;
-    }
     
+    ref = vector<double>(numStates);
+    if (reference_type == 0) {
 
-    vector<double> rho1b = density_1b((int)numStates/2,(int)numStates/2, weights, basis_path);
-    vector<double> rho2b = density_2b((int)numStates/2,(int)numStates/2, weights, basis_path);
+        // build the single reference filling to Fermi surface        
+        for (int i = 0; i < numStates; i++) {
+            if (i < nHoles)
+                ref[i] = 1.0;
+            else
+                ref[i] = 0.0;
+        }
+        
+    } else {
+        basis_path = "sd"+std::to_string(numStates)+".basis";
 
-    //int numStates = nholes + nparticles;
-    vector<double> ref(numStates);
-    vector<double> currentVec;
-    for (int i = 0; i < numWeights; i++) {
-        currentVec = matrix_row<matrix<int>>(basis, i);
-        vector_range<vector<double>> multiply_vec (currentVec, range(1,currentVec.size()));
+        std::cout << "Reading SD basis from " << basis_path << std::endl;
 
-        ref += weights[i]*multiply_vec;
+        //matrix<int> basis;
+        basis = readBasisFromFile(basis_path);
+
+        in_file = std::ifstream(basis_path);
+
+        if (in_file.good()) {
+            size_t pos = 0;
+            std::string line;
+            std::getline(in_file, line);
+
+            std::string delim = " ";
+            std::string token;
+
+            pos = line.find(delim);
+            token = line.substr(0, pos);
+            line.erase(0, pos + delim.length());
+            numWeights = std::stoi(line);
+
+        }
+        
+        weights = vector<double>(numWeights);
+        // weights[0] = sqrt(0.8);
+        // weights[1] = sqrt(0.2);
+        for (int i = 0; i < numWeights; i++) {
+            if (i == 0)
+                weights[i] = (0.8);
+            else if (i == 1)
+                weights[i] = (0.2);
+            else
+                weights[i] = 0.0;
+        }
+    
+        std::cout << "Generating 1b/2b density matrices from SD basis..." << std::endl;
+
+        rho1b = density_1b((int)numStates/2,(int)numStates/2, weights, 14, basis_path);
+        rho2b = density_2b((int)numStates/2,(int)numStates/2, weights, 14, basis_path);
+
+        //int numStates = nholes + nparticles;
+        for (int i = 0; i < numWeights; i++) {
+            currentVec = matrix_row<matrix<int>>(basis, i);
+            vector_range<vector<double>> multiply_vec (currentVec, range(1,currentVec.size()));
+
+            ref += weights[i]*multiply_vec;
+        }
     }
 
     // ref[0] = 1.0;
@@ -235,28 +300,24 @@ int main(int argc, char **argv) {
     std::cout << "Reference state = " << ref << std::endl;
     //ref.pack();
 
-    OccupationFactors occ(numStates, reference_type, ref);
+    occ = OccupationFactors(numStates, reference_type, ref);
 
-    Backend *backend; 
-    Backend_UBLAS cb_ublas(numStates, &occ);
-    Backend_TACO cb_taco(numStates, &occ);
+    cb_ublas = Backend_UBLAS(numStates, &occ);
+    cb_taco = Backend_TACO(numStates, &occ);
 
     switch (BACKEND_id) {
     case 0:
         backend = &cb_ublas;
-        break;
-        
+        break;        
     case 1:
         backend = &cb_taco;
         break;
-
     default:
         backend = &cb_ublas;
     }
 
-    Generator *generator;
-    White white(numStates, ref);
-    WhiteAtan whiteAtan(numStates, ref);
+    white = White(numStates, ref);
+    whiteAtan = WhiteAtan(numStates, ref);
 
     switch (generator_id) {
     case 0:
@@ -264,116 +325,30 @@ int main(int argc, char **argv) {
         break;
     case 1:
         generator = &whiteAtan;
+        break;
     default:
         generator = &white;
     }
 
-    PairingHamiltonian H(numStates, rho1b, rho2b, d,g,pb);
-    Flow_IMSRG2 flow(occ, backend);
+    switch (reference_type) {
+    case 0:
+        H = PairingHamiltonian(nHoles, nParticles, ref, d,g,pb);
+        break;
+    case 1:
+        H = PairingHamiltonian(numStates, rho1b, rho2b, d,g,pb);
+        break;
+    default:
+        H = PairingHamiltonian(nHoles, nParticles, ref, d,g,pb);
+    }
 
-    double E = H.get_E();
-    vector<double> f = H.get_f();
-    vector<double> Gamma = H.get_Gamma();
-    vector<double> W;
+    flow = Flow_IMSRG2(occ, backend);
 
-    // std::cout << "ref, " << ref << std::endl;
-    // std::cout << "E, " << E << std::endl;
-    // std::cout << "F, " << f << std::endl;
-    // std::cout << "Gamma, " << Gamma << std::endl;
+    E = H.get_E();
+    f = H.get_f();
+    Gamma = H.get_Gamma();
+    //W;
 
-    // for (int a = 0; a < numStates; a++) {
-    //     for (int b = 0; b < numStates; b++) {
-    //         for (int c = 0; c < numStates; c++) {
-    //             for (int d = 0; d < numStates; d++) {
-    //                 double val = Gamma(a,b,c,d);
-    //                 if (val != 0.0)
-    //                     printf("%d%d%d%d, %0.8f\n", a,b,c,d,val);
-    //             }
-    //         }
-    //     }
-    // }
-
-
-    // time_t ti, tf;
-
-    // ti = clock();
-    // vector<double> eta1b = white.compute_1b(f, Gamma, W);
-    // tf = clock();
-    // printf("calculate eta1b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
-
-    // ti = clock();
-    // vector<double> eta2b = white.compute_2b(f, Gamma, W);
-    // tf = clock();
-    // printf("calculate eta2b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
-
-    // ti = clock();
-    // double flow_0b = flow.flow_0b(f, Gamma, eta1b, eta2b);
-    // tf = clock();
-    // printf("calculate flow_0b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
-
-    // ti = clock();
-    // vector<double> flow_1b = flow.flow_1b(f, Gamma, eta1b, eta2b);
-    // tf = clock();
-    // printf("calculate flow_1b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
-
-    // ti = clock();
-    // vector<double> flow_2b = flow.flow_2b(f, Gamma, eta1b, eta2b);
-    // tf = clock();
-    // printf("calculate flow_2b, %.4e\n", double(tf-ti)/CLOCKS_PER_SEC);
-
-
-    // // for (int i = 0; i < numStates; i++)
-    // //     for (int j = 0; j < numStates; j++)
-    // //         std::cout << i << j << " " << f[i*numStates+j] << std::endl;
-    
-
-    // //eta1b = white.compute_1b(flow_1b, flow_2b, W);
-
-
-    // printf("ETA1B ********************************\n");
-    // std::cout << eta1b << std::endl;
-
-    // printf("ETA2B ********************************\n");
-    // std::cout << eta2b << std::endl;
-
-    // printf("FLOW0B ********************************\n");
-    // std::cout << flow_0b << std::endl;
-    
-    // printf("FLOW1B ********************************\n");
-    // std::cout << flow_1b << std::endl;
-
-    // printf("FLOW2B ********************************\n");
-    // std::cout << flow_2b << std::endl;
-
-    // //vector<double> ref = H.getReference();
-    // //double result = static_cast<const double*>(E.getStorage().getValues().getData())[0];
-
-    // std::cout << E  << std::endl;
-    //std::cout << ref << std::endl;
-
-    // state_type c;
-    // c.E = E;
-    // c.f = f;
-    // c.Gamma = Gamma;
-    // c.W = W;
-    // c.generator = white;
-    // c.flow = flow;
-
-    // container dcdt;
-    // double t = 1.0;
-    // derivative(c, dcdt, t);
-    
-    // vector<double> result;
-    // result() = c.E() + dcdt.E();
-    // cout << result << endl;
-
-    // std::vector<state_type> x_vec;
-    // std::vector<double> times;
-
-    //static SystemObserver *observer; //= observer.getInstance(); //new SystemObserver(x_vec, times);
-    //SystemObserver *observer = observer->getInstance();
-
-    std::string log_dir = "./flow/";
+    log_dir = "./flow/";
     const char* path_char = &log_dir[0];
     int check = mkdir(path_char, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
@@ -400,12 +375,11 @@ int main(int argc, char **argv) {
     // log_path += "-"+std::to_string(dt);
     log_path += ".log";
     std::cout << "Writing vacuum coefficient flow data log to " << log_path << std::endl;
-    std::ofstream out_file_vac(log_path); 
+    out_file_vac = std::ofstream(log_path); 
 
     log_path += ".imsrg";
     std::cout << "Writing IMSRG coefficient flow data log to " << log_path << std::endl;
-    std::ofstream out_file_imsrg(log_path); 
-
+    out_file_imsrg = std::ofstream(log_path); 
 
     out_file_vac << "numStates," << numStates << std::endl;
     out_file_vac << "d," << d << std::endl;
@@ -424,8 +398,8 @@ int main(int argc, char **argv) {
     out_file_imsrg << "dt," << dt << std::endl;
 
 
-    System sys(numStates, rho1b, rho2b, E, f, Gamma, W, generator, &flow, &out_file_vac, &out_file_imsrg);
-    state_type y0(1+f.size()+Gamma.size());
+    sys = System(numStates, rho1b, rho2b, E, f, Gamma, W, generator, &flow, &out_file_vac, &out_file_imsrg, reference_type);
+    y0 = state_type(1+f.size()+Gamma.size());
 
     sys.system2vector(E, f, Gamma, y0);
 

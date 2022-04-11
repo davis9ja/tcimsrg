@@ -4,7 +4,25 @@ To build program, run
 
     mkdir build; cd build
     cmake .. ../build/
-    ./main
+
+To execute program, run
+
+   ./solve_imsrg <args>
+
+## Executable arguments
+
+ - numStates=<int> (specify number of S.P. states in reference)
+ - nHoles=<int> (specify number of holes states in reference)
+ - nParticles=<int> (specify number of particle states in reference)
+ - d=<double> (energy spacing)
+ - g=<double> (pairing strength)
+ - pb=<double> (pair-breaking strength)
+ - t0=<double> (starting point for ODE solver)
+ - t1=<double> (ending point for ODE solver)
+ - dt=<double> (step width for ODE solver)
+ - generator_id=<0,1> (0: White generator with MP denominators, 1: Atan-regulated White)
+ - reference_type=<int> (unimplemented)
+ - solver=<0,1> (0:Adams-Bashforth-Moulton, 1:Runge-Kutta 4 point)
 
 `CMakeLists.txt` will automatically link the main.cpp executable against the TACO library.
 

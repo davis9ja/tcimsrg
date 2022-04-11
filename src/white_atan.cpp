@@ -11,7 +11,7 @@ private:
     boost::numeric::ublas::vector<double> reference;
 
 public:
-
+    WhiteAtan() {}
     WhiteAtan(int numStates, vector<double> &ref) {
         // this->n_holes = n_holes;
         // this->n_particles = n_particles;
@@ -82,8 +82,8 @@ public:
                 // std::cout << a << i << " RESULT " << result << std::endl;
 
 
-                eta1b_arr[idxai] = result;
-                eta1b_arr[idxia] = -result;
+                eta1b_arr[idxai] += result;
+                eta1b_arr[idxia] += -result;
 
                 // std::cout << a << i << " ETA 1B " << eta1b_arr[idxia] << std::endl;
 
@@ -162,11 +162,11 @@ public:
                         else
                             result = 0.0;
 
-                        eta2b_arr[idxabij] = result;
+                        eta2b_arr[idxabij] += result;
                         //if (result != 0.0)
                         //printf("%d%d%d%d\n", a,b,i,j);
 
-                        eta2b_arr[idxijab] = -result;
+                        eta2b_arr[idxijab] += -result;
 
                         //printf("%d\n",a*numStates*numStates*numStates + b*numStates*numStates + i*numStates + j);
                         // eta2b_tensor.insert({a,b,i,j}, eta2b[a*numStates + b*numStates + i*numStates + j]);

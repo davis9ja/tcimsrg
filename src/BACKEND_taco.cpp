@@ -30,7 +30,7 @@ private:
     // }
 
 public:
-
+    Backend_TACO(){}
     Backend_TACO(int numStates, OccupationFactors *occFact) {
 
         std::string factor_path = occFact->getPath();

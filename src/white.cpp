@@ -11,6 +11,7 @@ private:
     boost::numeric::ublas::vector<double> reference;
 
 public:
+    White() {}
 
     White(int numStates, vector<double> &ref) {
         // this->n_holes = n_holes;
@@ -40,6 +41,8 @@ public:
         // double* eta1b_arr = (double*)eta1b_tensor.getStorage().getValues().getData();
 
         vector<double> eta1b_arr(numStates*numStates);
+        for (int i = 0; i  < eta1b_arr.size(); i++)
+            eta1b_arr[i] = 0.0;
 
         double nbara, ni, nbara_sq, ni_sq;
         double denom, result;
@@ -75,8 +78,8 @@ public:
                 // std::cout << a << i << " RESULT " << result << std::endl;
 
 
-                eta1b_arr[idxai] = result;
-                eta1b_arr[idxia] = -result;
+                eta1b_arr[idxai] += result;
+                eta1b_arr[idxia] += -result;
 
                 // std::cout << a << i << " ETA 1B " << eta1b_arr[idxia] << std::endl;
 
@@ -107,6 +110,8 @@ public:
         //std::cout << f << "\n" << Gamma << "\n" << "\n" << reference << std::endl;
 
         vector<double> eta2b_arr(numStates*numStates*numStates*numStates);
+        for (int i = 0; i  < eta2b_arr.size(); i++)
+            eta2b_arr[i] = 0.0;
 
         double nbara, nbarb, ni, nj, nbara_sq, nbarb_sq, ni_sq, nj_sq;
         double denom, result;
@@ -151,11 +156,11 @@ public:
                         else
                             result = Gamma[idxabij]*nbarb*nbara*ni*nj / denom;
 
-                        eta2b_arr[idxabij] = result;
-                        //if (result != 0.0)
-                        //printf("%d%d%d%d\n", a,b,i,j);
+                        eta2b_arr[idxabij] += result;
+                        // if (Gamma[idxabij] != 0.0)
+                        //     printf("%d%d%d%d\n", a,b,i,j);
 
-                        eta2b_arr[idxijab] = -result;
+                        eta2b_arr[idxijab] += -result;
 
                         //printf("%d\n",a*numStates*numStates*numStates + b*numStates*numStates + i*numStates + j);
                         // eta2b_tensor.insert({a,b,i,j}, eta2b[a*numStates + b*numStates + i*numStates + j]);
