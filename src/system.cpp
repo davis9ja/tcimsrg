@@ -27,19 +27,6 @@ System::System(int numStates, vector<double> &rho1b, vector<double> &rho2b,
     out_file_vac = out_file_vac_in;
     out_file_imsrg = out_file_imsrg_in;
     this->reference_type = reference_type;
-    //this->observer = observer->getInstance();
-    
-    //this->sys_vec = vector<double>(1+fSize+GammaSize);
-
-    // this->sys_vec.reserve(1+fSize+GammaSize);
-    
-    // for(int i = 0; i < fSize+GammaSize+1; i++) {
-    //     sys_vec.push_back(0.0);
-    // }
-
-    //system2vector();
-
-    //printf("%8s\t%10s\t%10s\t%10s\n", "s", "E", "||eta1b||", "||eta2b||");
 }
 
 System::~System() {
@@ -96,8 +83,6 @@ System::~System() {
                             h2b_ijkl += h2b[i*numStates*numStates*numStates + j*numStates*numStates + k*numStates + l]*rho2b[i*numStates*numStates*numStates + j*numStates*numStates + k*numStates + l];
 
             h0b = E - h1b_ij - 0.25*h2b_ijkl;
-
-            //*out_file << t << ',';
             
             *out_file_vac << h0b << ',';
             for (int i = 0; i < h1b.size(); i++)
@@ -125,110 +110,43 @@ System::~System() {
 }
 
 void System::system2vector(double &E, vector<double> &f, vector<double> &Gamma, state_type &x) {
-    
-    // state_type y;
 
-    // double val = static_cast<const double*>(E.getStorage().getValues().getData())[0];
-    // y.push_back(val);
-
-    // for(int i = 0; i < f.getStorage().getValues().getSize(); i++)
-    //     y.push_back(static_cast<const double*>(f.getStorage().getValues().getData())[i]);
-
-    // for(int i = 0; i < Gamma.getStorage().getValues().getSize(); i++)
-    //     y.push_back(static_cast<const double*>(Gamma.getStorage().getValues().getData())[i]);
-    
-
-    // return y;
-
-    //double E_val, f_val, Gamma_val;
-    // int fSize = f.getStorage().getValues().getSize();
-    // int GammaSize = Gamma.getStorage().getValues().getSize();
     int fSize = f.size();
     int GammaSize = Gamma.size();
-    //state_type x(1+fSize+GammaSize);
 
-    //E_val = static_cast<const double*>(E.getStorage().getValues().getData())[0];
     x[0] = E;
 
     //#pragma omp parallel for
     for(int i = 0; i < fSize; i++) {
-        //f_val = static_cast<const double*>(f.getStorage().getValues().getData())[i];
         x[i+1] = f[i];
     }
     //std::cout << "done 1b" << std::endl;
     //#pragma omp parallel for
     for(int i = 0; i < GammaSize; i++) {
-        //Gamma_val = static_cast<const double*>(Gamma.getStorage().getValues().getData())[i];
         x[i+1+fSize] = Gamma[i];
     }
-    //std::cout << "done 2b" << std::endl;
 
 }
 
 void System::vector2system(const state_type &x, int fSize, double &E, vector<double> &f, vector<double> &Gamma) {
     
-    //double E_val, f_val, Gamma_val;
-    // int fSize = f.getStorage().getValues().getSize();
-    // int GammaSize = Gamma.getStorage().getValues().getSize();
     int GammaSize = fSize*fSize;
-    //state_type x(1+fSize+GammaSize);
 
-    //E_val = static_cast<const double*>(E.getStorage().getValues().getData())[0];
     E = x[0];
 
     //#pragma omp parallel for
     for(int i = 0; i < fSize; i++) {
-        //f_val = static_cast<const double*>(f.getStorage().getValues().getData())[i];
         f[i] = x[i+1];
     }
-    //std::cout << "done 1b" << std::endl;
+
     //#pragma omp parallel for
     for(int i = 0; i < GammaSize; i++) {
-        //Gamma_val = static_cast<const double*>(Gamma.getStorage().getValues().getData())[i];
         Gamma[i] = x[i+1+fSize];
     }
-    //std::cout << "done 2b" << std::endl;
-
 }
 
-// void System::reinitSystem(state_type x) {
-    
-//     this->E = x[0];
-
-//     // double* fArr = (double*)this->f.getStorage().getValues().getData();
-//     // double* GammaArr = (double*)this->Gamma.getStorage().getValues().getData();
-//     int fSize = numStates*numStates;
-//     int GammaSize = fSize*fSize;
-
-//     //#pragma omp parallel for
-//     for(int i = 1; i < fSize+1; i++)
-//         this->f[i-1] = x[i];
-//     //std::cout << "done 1b" << std::endl;
-//     //#pragma omp parallel for
-//     for(int i = fSize+1; i < GammaSize+1; i++)
-//         this->Gamma[i-fSize-1] = x[i];
-//     //std::cout << "done 2b" << std::endl;
-// }
 
 void System::operator() (const state_type &x, state_type &dxdt, const double t) {
-    //std::cout << "BEFORE, " << x[0] << std::endl;
-    //reinitSystem(x);
-    //std::cout << "AFTER, " << x[0] << std::endl;
-
-    //std::cout << "SIZE OF X " << x.size() << std::endl;
-    //std::cout << "SIZE OF E+F+GAMMA" << 1+f.size()+Gamma.size() << std::endl;
-
-    //std::cout << "rinit" << std::endl;
-    //std::cout << "x[0] " << x[0] << std::endl;
-    
-    // double E = this->E;
-    // vector<double> f = this->f;
-    // vector<double> Gamma = this->Gamma;
-
-    //std::cout << "E, " << E << std::endl;
-    //std::cout << "set up system variable" << std::endl;
-    // calculate generator from f, Gamma
-
     // Take state vector and extract into E, f, Gamma pointers
     vector2system(x, f.size(), E, f, Gamma);
 
@@ -245,34 +163,10 @@ void System::operator() (const state_type &x, state_type &dxdt, const double t) 
     // Set derivative
     system2vector(dE, df, dGamma, dxdt);
 
-
-    //observer->setEta2bNorm(this->eta2b_norm);
-
-    //printf("%0.4f\t%0.8f\t%0.8f\n", t, x[0], this->eta2b_norm);
-
-    //std::cout << this->eta2b_norm << std::endl;
-    
-    //std::cout << "eta2b, " << this->getEta2bNorm() << std::endl;
-
-    //std::cout << "F AT THE END " << f[7*numStates+3] << std::endl;
-    //std::cout << "de, " << dxdt[0] << std::endl;
-    //std::cout << "syste2mvector" << std::endl;
-    //reinitSystem();
-
-
-    
-    // for (int i = 0; i  < sys_vec.size(); i++)
-    //     cout << sys_vec[i] << endl;
-
-    //printf("%8s\t%10s\t%10s\t%10s\n", t, x[0], this->eta1b_norm, this->eta2b_norm);
-
 }
 
 void System::operator()( const state_type &x , double t )
 {
-    //states.push_back( x );
-    //times.push_back( t );
-    //std::cout << t << "\t" << x[0] << "\t"  << eta2b_norm << std::endl;
     double norm;
     vector<double> eta1b, eta2b;
 
@@ -300,11 +194,5 @@ void System::operator()( const state_type &x , double t )
     printf("%0.4f\t%0.8f\t%0.8f\t%0.8f\n", t, x[0], eta1b_norm, eta2b_norm);
 
     data_log.push_back(x);
-    // if ((*out_file).is_open()) {
-    //     *out_file << t << ',';
-    //     for (int j = 0; j < x.size(); j++)
-    //         *out_file << x[j] << ',';
-    //     *out_file << "\n";
-    // }
     
 }

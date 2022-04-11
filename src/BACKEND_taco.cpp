@@ -45,7 +45,7 @@ public:
     
 
     double flow_0b(vector<double> &f, vector<double> &Gamma, 
-                                vector<double> &eta1b, vector<double> &eta2b) {
+                   vector<double> &eta1b, vector<double> &eta2b) {
 
         int numStates = (int)sqrt(f.size());
         std::vector<int> shape_r2 = {numStates,numStates};
@@ -171,7 +171,7 @@ public:
     }
 
     vector<double> flow_2b(vector<double> &f, vector<double> &Gamma, 
-                                        vector<double> &eta1b, vector<double> &eta2b) {
+                           vector<double> &eta1b, vector<double> &eta2b) {
         int numStates = (int)sqrt(f.size());
         std::vector<int> shape_r2 = {numStates,numStates};
         std::vector<int> shape_r4 = {numStates,numStates,numStates,numStates};
