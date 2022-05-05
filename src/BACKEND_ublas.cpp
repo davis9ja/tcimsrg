@@ -22,9 +22,13 @@ private:
         return i*numStates*numStates*numStates + j*numStates*numStates + k*numStates + l;
     }
 
-    vector<double> occA, occB, occC, occD;
+    vector<double> occA, occB, occC, occC2, occD;
 
 public:
+    using Backend::flow_0b;
+    using Backend::flow_1b;
+    using Backend::flow_2b;
+    
     Backend_UBLAS(){}
     Backend_UBLAS(int numStates, OccupationFactors *occFact) {        
 
@@ -35,9 +39,10 @@ public:
         this->occA = vector<double>(numStates*numStates);
         this->occB = vector<double>(numStates*numStates);
         this->occC = vector<double>(numStates*numStates*numStates);        
+        this->occC2 = vector<double>(numStates*numStates*numStates);        
         this->occD = vector<double>(numStates*numStates*numStates*numStates);        
         
-        (*occFact).contractOccTensors(path, this->occA, this->occB, this->occC, this->occD);
+        (*occFact).contractOccTensors(path, this->occA, this->occB, this->occC, this->occC2, this->occD);
         
     }
 
@@ -253,5 +258,30 @@ public:
 
         return dGamma;
     }
+
+
+    double flow_0b(vector<double> &f, vector<double> &Gamma, 
+                           vector<double> &eta1b, vector<double> &eta2b,
+                           vector<double> &rho1b, vector<double> &rho2b,
+                           vector<double> &dGamma) {
+
+        std::cout << "MULTI-REFERENCE UNIMPLEMENTED FOR THIS BACKEND, EXITING..." << std::endl;
+        exit(1);
+    }
+
+    vector<double> flow_1b(vector<double> &f, vector<double> &Gamma, 
+                           vector<double> &eta1b, vector<double> &eta2b,
+                           vector<double> &rho1b, vector<double> &rho2b) {
+
+        std::cout << "MULTI-REFERENCE UNIMPLEMENTED FOR THIS BACKEND, EXITING..." << std::endl;
+        exit(1);
+    }
     
+    vector<double> flow_2b(vector<double> &f, vector<double> &Gamma, 
+                           vector<double> &eta1b, vector<double> &eta2b,
+                           vector<double> &rho1b, vector<double> &rho2b) {
+
+        std::cout << "MULTI-REFERENCE UNIMPLEMENTED FOR THIS BACKEND, EXITING..." << std::endl;
+        exit(1);
+    }
 };

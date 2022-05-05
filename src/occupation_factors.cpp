@@ -31,6 +31,7 @@ OccupationFactors::OccupationFactors(int numStates, int refType, vector<double> 
     writeA();
     writeB();
     writeC();
+    writeC2();
     writeD();
 }
 
@@ -41,8 +42,8 @@ std::string OccupationFactors::getPath() {
 void OccupationFactors::readOccTensors(std::string factor_path,
                                        Tensor<double> &occA_a, Tensor<double> &occA_b, 
                                        Tensor<double> &occB_a, Tensor<double> &occB_b,
-                                       Tensor<double> &occC_a, Tensor<double> &occC_b, 
-                                       Tensor<double> &occC_c,
+                                       Tensor<double> &occC_a, Tensor<double> &occC_b, Tensor<double> &occC_c,
+                                       Tensor<double> &occC2_a, Tensor<double> &occC2_b, Tensor<double> &occC2_c,
                                        Tensor<double> &occD_a, Tensor<double> &occD_b,
                                        Tensor<double> &occD_c, Tensor<double> &occD_d) {
     
@@ -59,6 +60,10 @@ void OccupationFactors::readOccTensors(std::string factor_path,
     occC_b = read(factor_path+"occC_b.tns", format_r3);
     occC_c = read(factor_path+"occC_c.tns", format_r2);
 
+    occC2_a = read(factor_path+"occC2_a.tns", format_r2);
+    occC2_b = read(factor_path+"occC2_b.tns", format_r2);
+    occC2_c = read(factor_path+"occC2_c.tns", format_r3);
+
     occD_a = read(factor_path+"occD_a.tns", format_r2);
     occD_b = read(factor_path+"occD_b.tns", format_r2);
     occD_c = read(factor_path+"occD_c.tns", format_r2);
@@ -69,6 +74,7 @@ void OccupationFactors::contractOccTensors(std::string factor_path,
                                            vector<double> &occA, 
                                            vector<double> &occB, 
                                            vector<double> &occC,
+                                           vector<double> &occC2,
                                            vector<double> &occD) {
     //int numStates = n_holes+n_particles;
 
@@ -76,6 +82,7 @@ void OccupationFactors::contractOccTensors(std::string factor_path,
         occA_a, occA_b, 
         occB_a, occB_b,
         occC_a, occC_b, occC_c,
+        occC2_a, occC2_b, occC2_c,
         occD_a, occD_b, occD_c, occD_d;
 
     // TRANSFORM OCCUPATION TENSORS
@@ -89,6 +96,7 @@ void OccupationFactors::contractOccTensors(std::string factor_path,
     Tensor<double> occA_t(shape_r2, format_r2);
     Tensor<double> occB_t(shape_r2, format_r2);
     Tensor<double> occC_t(shape_r3, format_r3);
+    Tensor<double> occC2_t(shape_r3, format_r3);
     Tensor<double> occD_t(shape_r4, format_r4);
     // vector<double> occA(numStates*numStates);
     // vector<double> occD(numStates*numStates*numStates*numStates);
@@ -97,22 +105,26 @@ void OccupationFactors::contractOccTensors(std::string factor_path,
                    occA_a, occA_b, 
                    occB_a, occB_b,
                    occC_a, occC_b, occC_c,
+                   occC2_a, occC2_b, occC2_c,
                    occD_a, occD_b, occD_c, occD_d);
 
     IndexVar a,b,c,d,p,q;
     occA_t(a,b) = occA_a(a,p)*occA_b(p,b);
     occB_t(a,b) = occB_a(a,p)*occB_b(p,b);
     occC_t(a,b,c) = occC_a(a,p)*occC_b(p,b,q)*occC_c(q,c);
+    occC2_t(a,b,c) = occC2_b(a,p)*occC2_c(p,b,q)*occC2_a(q,c);
     occD_t(a,b,c,d) = occD_a(a,p)*occD_b(p,b)*occD_c(c,q)*occD_d(q,d);
 
     occA_t.evaluate();
     occB_t.evaluate();
     occC_t.evaluate();
+    occC2_t.evaluate();
     occD_t.evaluate();
 
     tensor2vector(occA_t, occA);
     tensor2vector(occB_t, occB);
     tensor2vector(occC_t, occC);
+    tensor2vector(occC2_t, occC2);
     tensor2vector(occD_t, occD);
     
 }
@@ -194,6 +206,40 @@ void OccupationFactors::writeC() {
     write(path+"occC_a.tns", occC_a);
     write(path+"occC_b.tns", occC_b);
     write(path+"occC_c.tns", occC_c);    
+}
+
+void OccupationFactors::writeC2() {
+    //int numStates = n_holes+n_particles;
+
+    Tensor<double> occC2_b({numStates,4}, Format({Dense,Dense}));
+    Tensor<double> occC2_c({4,numStates,4}, Format({Dense,Dense,Dense}));
+    Tensor<double> occC2_a({4, numStates}, Format({Dense,Dense}));
+
+    for (int a = 0; a < numStates; a++) {
+        double val = ref[a];
+        occC2_b.insert({a,0}, val);
+        occC2_b.insert({a,1}, 1.0);
+        occC2_b.insert({a,2}, 1.0);
+        occC2_b.insert({a,3}, val);
+
+        occC2_c.insert({0,a,0}, val);
+        occC2_c.insert({1,a,1}, 1.0);
+        occC2_c.insert({2,a,2}, -val);
+        occC2_c.insert({3,a,3}, 1.0);
+
+        occC2_a.insert({0,a}, 1.0);
+        occC2_a.insert({1,a}, val);
+        occC2_a.insert({2,a}, val);
+        occC2_a.insert({3,a}, val);        
+    }
+
+    occC2_a.pack();
+    occC2_b.pack();
+    occC2_c.pack();
+
+    write(path+"occC2_a.tns", occC2_a);
+    write(path+"occC2_b.tns", occC2_b);
+    write(path+"occC2_c.tns", occC2_c);    
 }
 
 void OccupationFactors::writeD() {

@@ -100,6 +100,12 @@ System::~System() {
         for (int i = 0; i < data_log.size(); i++) {
             state_type x = data_log[i];
 
+            // for (int j = 0; j < x.size(); j++)
+            //     out_file_imsrg->write((char *) &x[j], sizeof(double));
+
+            // for (int j = 0; j < x.size(); j++)
+            //     *out_file_imsrg << x[j];
+
             for (int j = 0; j < x.size(); j++)
                 *out_file_imsrg << x[j] << ',';
 
@@ -156,10 +162,23 @@ void System::operator() (const state_type &x, state_type &dxdt, const double t) 
     vector<double> eta2b = (*generator).compute_2b(f, Gamma, W);
 
     // Flow E, f, Gamma
-    dE = (*flow).flow_0b(f, Gamma, eta1b, eta2b);
-    df = (*flow).flow_1b(f, Gamma, eta1b, eta2b);
-    dGamma = (*flow).flow_2b(f, Gamma, eta1b, eta2b);
-    
+    switch (reference_type) {
+    case 0:
+        dE = (*flow).flow_0b(f, Gamma, eta1b, eta2b);
+        df = (*flow).flow_1b(f, Gamma, eta1b, eta2b);
+        dGamma = (*flow).flow_2b(f, Gamma, eta1b, eta2b);
+        break;
+    case 1:        
+        dGamma = (*flow).flow_2b(f, Gamma, eta1b, eta2b, rho1b, rho2b);
+        df = (*flow).flow_1b(f, Gamma, eta1b, eta2b, rho1b, rho2b);
+        dE = (*flow).flow_0b(f, Gamma, eta1b, eta2b, rho1b, rho2b, dGamma);
+        break;
+    default:
+        dE = (*flow).flow_0b(f, Gamma, eta1b, eta2b);
+        df = (*flow).flow_1b(f, Gamma, eta1b, eta2b);
+        dGamma = (*flow).flow_2b(f, Gamma, eta1b, eta2b);
+        
+    }
     // Set derivative
     system2vector(dE, df, dGamma, dxdt);
 

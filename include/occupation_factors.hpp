@@ -22,6 +22,7 @@ private:
     void writeA();
     void writeB();
     void writeC();
+    void writeC2();
     void writeD();
 
     std::string path;
@@ -38,8 +39,8 @@ public:
     void readOccTensors(std::string factor_path,
                         taco::Tensor<double> &occA_a, taco::Tensor<double> &occA_b, 
                         taco::Tensor<double> &occB_a, taco::Tensor<double> &occB_b,
-                        taco::Tensor<double> &occC_a, taco::Tensor<double> &occC_b, 
-                        taco::Tensor<double> &occC_c,
+                        taco::Tensor<double> &occC_a, taco::Tensor<double> &occC_b, taco::Tensor<double> &occC_c,
+                        taco::Tensor<double> &occC2_a, taco::Tensor<double> &occC2_b, taco::Tensor<double> &occC2_c,
                         taco::Tensor<double> &occD_a, taco::Tensor<double> &occD_b,
                         taco::Tensor<double> &occD_c, taco::Tensor<double> &occD_d);
 
@@ -47,6 +48,7 @@ public:
                             boost::numeric::ublas::vector<double> &occA, 
                             boost::numeric::ublas::vector<double> &occB, 
                             boost::numeric::ublas::vector<double> &occC,
+                            boost::numeric::ublas::vector<double> &occC2,
                             boost::numeric::ublas::vector<double> &occD);
 
 };

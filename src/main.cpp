@@ -6,6 +6,7 @@
 #include <chrono>
 #include <iostream>
 #include <fstream>
+#include <omp.h>
 
 #include "taco.h"
 #include "dmcpp.hpp"
