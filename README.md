@@ -21,7 +21,7 @@ To execute program, run
  - t1=<double> (ending point for ODE solver)
  - dt=<double> (step width for ODE solver)
  - generator_id=<0,1> (0: White generator with MP denominators, 1: Atan-regulated White)
- - reference_type=<int> (unimplemented)
+ - reference_type=<0,1> (0: single reference, 1: ensemble reference)
  - solver=<0,1> (0:Adams-Bashforth-Moulton, 1:Runge-Kutta 4 point)
 
 `CMakeLists.txt` will automatically link the main.cpp executable against the TACO library.
@@ -44,8 +44,9 @@ Tensor Algebra Compiler code at [https://github.com/tensor-compiler/taco]()
   - want two files: IMSRG coefficients and vacuum coefficients (including s vals and ||eta1b||, ||eta2b||)
 - [x] Add White Atan generator
   - seems to work better for floating point reference states, without including irreducible DMs in flow equations (should investigate this)
-- [ ] Add the multi-reference IMSRG equations
+- [x] Add the multi-reference IMSRG equations
   - the flow seems unstable for fractional density matrices without including irreducible components in flow equations
+  - complete up to 2b densities
 
 ## Purpose
 Build system for solving the pairing-plus-particle-hole model Hamiltonian using IMSRG(2). 
