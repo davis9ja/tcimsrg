@@ -382,21 +382,21 @@ int main(int argc, char **argv) {
     std::cout << "Writing IMSRG coefficient flow data log to " << log_path << std::endl;
     out_file_imsrg = std::ofstream(log_path); 
 
-    out_file_vac << "numStates," << numStates << std::endl;
-    out_file_vac << "d," << d << std::endl;
-    out_file_vac << "g," << g << std::endl;
-    out_file_vac << "pb," << pb << std::endl;
-    out_file_vac << "t0," << t0 << std::endl;
-    out_file_vac << "t1," << t1 << std::endl;
-    out_file_vac << "dt," << dt << std::endl;
+    out_file_vac << "#numStates," << numStates << std::endl;
+    out_file_vac << "#d," << d << std::endl;
+    out_file_vac << "#g," << g << std::endl;
+    out_file_vac << "#pb," << pb << std::endl;
+    out_file_vac << "#t0," << t0 << std::endl;
+    out_file_vac << "#t1," << t1 << std::endl;
+    out_file_vac << "#dt," << dt << std::endl;
 
-    out_file_imsrg << "numStates," << numStates << std::endl;
-    out_file_imsrg << "d," << d << std::endl;
-    out_file_imsrg << "g," << g << std::endl;
-    out_file_imsrg << "pb," << pb << std::endl;
-    out_file_imsrg << "t0," << t0 << std::endl;
-    out_file_imsrg << "t1," << t1 << std::endl;
-    out_file_imsrg << "dt," << dt << std::endl;
+    out_file_imsrg << "#numStates," << numStates << std::endl;
+    out_file_imsrg << "#d," << d << std::endl;
+    out_file_imsrg << "#g," << g << std::endl;
+    out_file_imsrg << "#pb," << pb << std::endl;
+    out_file_imsrg << "#t0," << t0 << std::endl;
+    out_file_imsrg << "#t1," << t1 << std::endl;
+    out_file_imsrg << "#dt," << dt << std::endl;
 
 
     sys = System(numStates, rho1b, rho2b, E, f, Gamma, W, generator, &flow, &out_file_vac, &out_file_imsrg, reference_type);
@@ -427,8 +427,8 @@ int main(int argc, char **argv) {
     
     std::cout << "\nDone " << duration.count() << " microseconds" << std::endl;
 
-    out_file_vac << "elapsed," << duration.count() << std::endl;
-    out_file_imsrg << "elapsed," << duration.count() << std::endl;
+    out_file_vac << "#elapsed," << duration.count() << std::endl;
+    out_file_imsrg << "#elapsed," << duration.count() << std::endl;
 
     out_file_vac.close();
     out_file_imsrg.close();    
