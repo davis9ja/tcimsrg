@@ -87,9 +87,9 @@ System::~System() {
             *out_file_vac << h0b << ',';
             for (int i = 0; i < h1b.size(); i++)
                 *out_file_vac << h1b[i] << ',';
-            for (int i = 0; i < h2b.size(); i++)
+            for (int i = 0; i < h2b.size()-1; i++)
                 *out_file_vac << h2b[i] << ',';
-            
+            *out_file_vac << h2b[h2b.size()-1];
             *out_file_vac << std::fixed << std::setprecision(13) << "\n";
 
         }
@@ -106,9 +106,9 @@ System::~System() {
             // for (int j = 0; j < x.size(); j++)
             //     *out_file_imsrg << x[j];
 
-            for (int j = 0; j < x.size(); j++)
+            for (int j = 0; j < x.size()-1; j++)
                 *out_file_imsrg << x[j] << ',';
-
+            *out_file_imsrg << x[x.size()-1];
             *out_file_imsrg << std::fixed << std::setprecision(13) << "\n";
         }
     }
