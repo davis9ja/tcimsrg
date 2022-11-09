@@ -15,11 +15,14 @@
 #include "generator.hpp"
 #include "flow_imsrg2.hpp"
 #include "system.hpp"
+#include "DMD.h"
 
 #include "white.cpp"
 #include "white_atan.cpp"
 #include "BACKEND_ublas.cpp"
 #include "BACKEND_taco.cpp"
+#include "DMD.c"
+
 //#include "derivative.hpp"
 
 void process_user_input(int argc, char **argv, 
@@ -29,7 +32,8 @@ void process_user_input(int argc, char **argv,
                         double &t0, double &t1, double &dt,
                         int &generator_id,
                         int &reference_type,
-                        int &solver, int &BACKEND_id) {
+                        int &solver, int &BACKEND_id,
+                        int &dmdOn, int &dmdObs, int &dmdTrunc) {
 
     // SET DEFAULT PARAMS
     numStates = 8;
@@ -45,6 +49,9 @@ void process_user_input(int argc, char **argv,
     reference_type = 0;
     solver = 0;
     BACKEND_id = 1;
+    dmdOn = 0;
+    dmdObs = 20;
+    dmdTrunc = 4;
     
     std::cout << "Running IMSRG(2) on pairing-plus-particle-hole model\n";
     if (argc > 1) {
@@ -87,13 +94,19 @@ void process_user_input(int argc, char **argv,
                 solver = std::stof(param_val);
             else if (param_str == "BACKEND_id")
                 BACKEND_id = std::stof(param_val);
+            else if (param_str == "dmdOn")
+                dmdOn = std::stoi(param_val);
+            else if (param_str == "dmdObs")
+                dmdObs = std::stoi(param_val);
+            else if (param_str == "dmdTrunc")
+                dmdTrunc = std::stoi(param_val);
             else
                 std::cout << param_str << " not recognized as input parameter.\n" << std::endl;
         }
     }
 
     if (reference_type == 1)
-        printf("Parameters:\n\t# s.p. states = %d\n\td=%0.3f\n\tg=%0.3f\n\tpb=%0.3f\n", numStates, d, g, pb);
+        printf("Parameters:\n\t# s.p. states = %d\n\td=%f\n\tg=%f\n\tpb=%f\n", numStates, d, g, pb);
     else if (reference_type == 0) {
         printf("Parameters:\n\t# holes = %d\n\t# particles = %d\n\td=%0.3f\n\tg=%0.3f\n\tpb=%0.3f\n", nHoles, nParticles, d, g, pb);
         numStates = nHoles + nParticles;
@@ -134,29 +147,58 @@ void process_user_input(int argc, char **argv,
         std::cout << "FLOW COMPUTER DOES NOT EXIST. EXITING...";
         exit(1);
     }
+
+    if (dmdOn == 1) {
+        std::cout << "***DMD EMULATION ON***\n"; 
+        std::cout << "\tEmulation will BEGIN at " << dmdObs << " solver interations, or s = " << (float)dmdObs*dt << "\n";
+        std::cout << "\tEmulating in r = " << dmdTrunc << " truncated measurement subspace\n";
+    }
         
 
 }
 
-void write_log(std::string file_path, std::vector<state_type> data) {
+void write_log(std::ofstream *out_file_imsrg, std::vector<state_type> data_log) {
 
-    std::ofstream out_file(file_path);
-    if (out_file.is_open()) {
-        for (int i = 0; i < data.size(); i++) {
-            state_type x = data[i];
-            
-            for (int j = 0; j < x.size(); j++)
-                out_file << x[j] << ',';
+    if((*out_file_imsrg).is_open()) {
 
-            out_file << '\n';
+        for (int i = 0; i < data_log.size(); i++) {
+            state_type x = data_log[i];
+
+            // for (int j = 0; j < x.size(); j++)
+            //     out_file_imsrg->write((char *) &x[j], sizeof(double));
+
+            // for (int j = 0; j < x.size(); j++)
+            //     *out_file_imsrg << x[j];
+
+            for (int j = 0; j < x.size()-1; j++)
+                *out_file_imsrg << x[j] << ',';
+            *out_file_imsrg << x[x.size()-1];
+            *out_file_imsrg << std::fixed << std::setprecision(13) << "\n";
         }
-
-        out_file.close();
+    } else {
+        std::cout << "Log file not created for some reason" << std::endl;
     }
+
+
+    // std::ofstream out_file(file_path);
+    // if (out_file.is_open()) {
+    //     for (int i = 0; i < data.size(); i++) {
+    //         state_type x = data[i];
+            
+    //         for (int j = 0; j < x.size(); j++)
+    //             out_file << x[j] << ',';
+
+    //         out_file << '\n';
+    //     }
+
+    //     out_file.close();
+    // }
 
 }
 
 int main(int argc, char **argv) {
+    omp_set_num_threads(4);
+
     using namespace taco;
     using namespace boost::numeric::odeint;
     using namespace boost::numeric::ublas;
@@ -168,8 +210,8 @@ int main(int argc, char **argv) {
 
     // int nholes = 4;
     // int nparticles = 4;
-    int numStates, nHoles, nParticles, generator_id, reference_type, solver, BACKEND_id;
-    double d, g, pb, t0, t1, dt;
+    int numStates, nHoles, nParticles, generator_id, reference_type, solver, BACKEND_id, dmdOn, dmdObs, dmdTrunc;
+    double d, g, pb, t0, t1, dt, t1_integrate;
 
     // for IMSRG
     OccupationFactors occ;
@@ -190,6 +232,8 @@ int main(int argc, char **argv) {
 
     System sys;
     state_type y0;
+    std::vector<state_type> data_log;
+    state_type test;
 
     vector<double> ref;
     
@@ -206,13 +250,17 @@ int main(int argc, char **argv) {
     std::ofstream out_file_vac;
     std::ofstream out_file_imsrg;
 
+    // for DMD
+    DMD dmd;
+
     process_user_input(argc, argv, 
                        numStates,
                        nHoles, nParticles,
                        d, g, pb,
                        t0, t1, dt,
                        generator_id, reference_type,
-                       solver, BACKEND_id);
+                       solver, BACKEND_id,
+                       dmdOn, dmdObs, dmdTrunc);
     
     ref = vector<double>(numStates);
     if (reference_type == 0) {
@@ -365,7 +413,7 @@ int main(int argc, char **argv) {
     else 
         log_path += "S";
 
-    boost::format fmt = boost::format("%02d-%0.2f-%0.2f-%0.2f-%0.2f-%0.2f-%0.2f")%numStates%d%g%pb%t0%t1%dt;
+    boost::format fmt = boost::format("%02d-%f-%f-%f-%0.2f-%0.2f-%0.2f")%numStates%d%g%pb%t0%t1%dt;
     log_path += fmt.str();
     // log_path += std::to_string(numStates);
     // log_path += "-"+std::to_string(d);
@@ -407,19 +455,101 @@ int main(int argc, char **argv) {
     //size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500);
     //size_t steps = integrate_n_steps(stepper, sys, y0, 0.0, 0.1, 500, sys);
 
+    if (dmdOn == 1)
+        t1_integrate = (float)dmdObs*dt;
+    else
+        t1_integrate = t1;
+
     auto start = std::chrono::high_resolution_clock::now();
 
     size_t steps;
     switch (solver) {
     case 0:
-        steps = integrate_adaptive(abm_stepper, sys, y0, t0, t1, dt, sys);
+        steps = integrate_adaptive(abm_stepper, sys, y0, t0, t1_integrate, dt, boost::ref(sys));
         break;
     case 1:
-        steps = integrate_adaptive(rk_stepper, sys, y0, t0, t1, dt, sys);
+        steps = integrate_adaptive(rk_stepper, sys, y0, t0, t1_integrate, dt, boost::ref(sys));
         break;
     default:
-        steps = integrate_adaptive(abm_stepper, sys, y0, t0, t1, dt, sys);        
+        steps = integrate_adaptive(abm_stepper, sys, y0, t0, t1_integrate, dt, boost::ref(sys));
     }
+
+    data_log = sys.getFlowData();
+
+    if (dmdOn == 1) {
+        double alpha = 1.0, beta = 0.0;
+        MKL_INT incx = 1, incy = 1;
+
+        int nRows = data_log[0].size();
+        int nColumns = data_log.size();
+
+        double* dmdData = (double*)malloc(nRows*nColumns*sizeof(double));
+        double* ys = (double*)malloc(nRows*sizeof(double));  
+        double* work_phi_eig = (double*)malloc(nRows*dmdTrunc*sizeof(double));
+
+        state_type ys_to_log(nRows);
+
+        double numItersTotal = (t1-t0)/dt;
+        
+        std::cout << "numItersTotal, " << numItersTotal << std::endl;
+
+        for (int j = 0; j < nColumns; j++) {
+            for (int i = 0; i < nRows; i++) {
+                dmdData[i*nColumns + j] = ceil(data_log[j][i]*1e13)/1e13;
+                work_phi_eig[i] = 0.0;
+                ys[i] = 0.0;
+            }
+        }
+       
+        compute_dmd(&dmd, dmdData, nColumns, nRows, dmdTrunc);
+
+        // set background
+        //dmd.eig[0] = 1.0;
+        for (int i = 0; i < dmdTrunc; i++) {
+            if (dmd.eig[i] > 1 || dmd.eig[i] < 0) {
+                printf("%6.8f [%d], ", dmd.eig[i], i);
+                dmd.eig[i] = 1.;
+            }
+        }
+        printf(" ARE UNSTABLE EIGENVALUES; SETTING TO 1\n");
+
+        printf("\tDMD eigenvalues: ");
+        for (int i = 0; i < dmdTrunc; i++)
+            printf("%6.4f,", dmd.eig[i]);
+        printf("\n");
+
+        printf("\tPhi values: ");
+        for (int i = 0; i < dmdTrunc; i++)
+            printf("%6.4f,", dmd.phi[i]);
+        printf("\n");
+
+
+        for (int p = steps+1; p < numItersTotal+1; p++) {
+
+            for (int i = 0; i < nRows; i++) {
+                for (int j = 0; j < dmdTrunc; j++) {
+                    work_phi_eig[i*dmdTrunc + j] = dmd.phi[i*dmdTrunc + j]*pow(dmd.eig[j], p);
+                }
+            }
+            cblas_dgemv(CblasRowMajor, CblasNoTrans, nRows, dmdTrunc, alpha, work_phi_eig, dmdTrunc, dmd.b, incx, beta, ys, incy);
+
+            //state_type ys_to_log(ys);
+            std::copy(ys,ys+nRows, ys_to_log.begin());
+
+            data_log.push_back(ys_to_log);
+
+            printf("%0.4f  %0.8f\n", p*dt, ys[0]);
+        }
+
+
+        free(ys);
+        free(dmdData);
+        free(dmd.phi);
+        free(dmd.eig);
+        free(dmd.b);
+    }
+        
+    //std::cout << sys.getFlowData() << std::endl;
 
     auto stop = std::chrono::high_resolution_clock::now();
 
@@ -427,12 +557,18 @@ int main(int argc, char **argv) {
     
     std::cout << "\nDone " << duration.count() << " microseconds" << std::endl;
 
+    write_log(&out_file_imsrg, data_log);
+    std::cout << data_log.size() << " lines from data log successfully written." << std::endl;
+
     out_file_vac << "#elapsed," << duration.count() << std::endl;
     out_file_imsrg << "#elapsed," << duration.count() << std::endl;
 
     out_file_vac.close();
     out_file_imsrg.close();    
 
+    std::system(("zip -r " + log_path+".zip " + log_path).c_str());
+    std::remove((log_path).c_str());
+    
     //std::cout << sys.getFlowData() << std::endl;
     //write_log(log_path, sys.getFlowData());
 

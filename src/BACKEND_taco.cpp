@@ -1,6 +1,7 @@
 #include "BACKEND.hpp"
 #include "taco.h"
 #include "imsrg_utils.hpp"
+#include <omp.h>
 
 using namespace boost::numeric::ublas;
 using namespace taco;
@@ -54,7 +55,6 @@ public:
 
     double flow_0b(vector<double> &f, vector<double> &Gamma, 
                    vector<double> &eta1b, vector<double> &eta2b) {
-
         int numStates = (int)sqrt(f.size());
         std::vector<int> shape_r2 = {numStates,numStates};
         std::vector<int> shape_r3 = {numStates,numStates,numStates};

@@ -95,23 +95,23 @@ System::~System() {
         }
     }
 
-    if((*out_file_imsrg).is_open()) {
+    // if((*out_file_imsrg).is_open()) {
 
-        for (int i = 0; i < data_log.size(); i++) {
-            state_type x = data_log[i];
+    //     for (int i = 0; i < data_log.size(); i++) {
+    //         state_type x = data_log[i];
 
-            // for (int j = 0; j < x.size(); j++)
-            //     out_file_imsrg->write((char *) &x[j], sizeof(double));
+    //         // for (int j = 0; j < x.size(); j++)
+    //         //     out_file_imsrg->write((char *) &x[j], sizeof(double));
 
-            // for (int j = 0; j < x.size(); j++)
-            //     *out_file_imsrg << x[j];
+    //         // for (int j = 0; j < x.size(); j++)
+    //         //     *out_file_imsrg << x[j];
 
-            for (int j = 0; j < x.size()-1; j++)
-                *out_file_imsrg << x[j] << ',';
-            *out_file_imsrg << x[x.size()-1];
-            *out_file_imsrg << std::fixed << std::setprecision(13) << "\n";
-        }
-    }
+    //         for (int j = 0; j < x.size()-1; j++)
+    //             *out_file_imsrg << x[j] << ',';
+    //         *out_file_imsrg << x[x.size()-1];
+    //         *out_file_imsrg << std::fixed << std::setprecision(13) << "\n";
+    //     }
+    // }
     
 }
 
