@@ -566,7 +566,7 @@ int main(int argc, char **argv) {
     out_file_vac.close();
     out_file_imsrg.close();    
 
-    std::system(("zip -r " + log_path+".zip " + log_path).c_str());
+    std::system(("gzip " + log_path).c_str());
     std::remove((log_path).c_str());
     
     //std::cout << sys.getFlowData() << std::endl;

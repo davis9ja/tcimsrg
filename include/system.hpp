@@ -56,7 +56,7 @@ public:
            std::ofstream *out_file_imsrg,
            int reference_type
            );
-    ~System();
+    //~System();
 
     void system2vector(double &E, 
                        boost::numeric::ublas::vector<double> &f,
