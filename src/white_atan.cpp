@@ -28,10 +28,6 @@ public:
         //eta3b = vector<double>("eta2b", {numStates,numStates,numStates,numStates,numStates,numStates}, f3b);
     }
 
-    int sgn(double x) {
-        return (x > 0) ? 1 : ((x < 0) ? -1 : 0);
-    }
-
     vector<double> compute_1b(vector<double> &f, vector<double> &Gamma, vector<double> &W) {
 
         // vector<double> eta1b_tensor("eta1b", {numStates,numStates}, f1b);

@@ -77,6 +77,22 @@ double Flow_IMSRG2::flow_0b(vector<double> &f, vector<double> &Gamma,
     return dE;
 }
 
+// ** up to 3B density
+double Flow_IMSRG2::flow_0b(vector<double> &f, vector<double> &Gamma, 
+                            vector<double> &eta1b, vector<double> &eta2b,
+                            vector<double> &rho1b, vector<double> &rho2b, vector<double> &rho3b,
+                            vector<double> &dGamma) {
+
+    // Return
+    double dE;
+
+    // RUN FLOW ON BACKEND
+    dE = backend->flow_0b(f, Gamma, eta1b, eta2b, rho1b, rho2b, rho3b, dGamma);
+
+    return dE;
+}
+
+
 vector<double> Flow_IMSRG2::flow_1b(vector<double> &f, vector<double> &Gamma,
                                     vector<double> &eta1b, vector<double> &eta2b,
                                     vector<double> &rho1b, vector<double> &rho2b) {

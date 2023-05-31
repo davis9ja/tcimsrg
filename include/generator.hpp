@@ -19,6 +19,12 @@ public:
     virtual boost::numeric::ublas::vector<double> compute_2b(boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W) = 0;
     virtual boost::numeric::ublas::vector<double> compute_3b(boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W) = 0;
 
+    int sgn(double x) {
+        return (x > 0) ? 1 : ((x < 0) ? -1 : 0);
+    }
+
+
+
 };
 
 #endif

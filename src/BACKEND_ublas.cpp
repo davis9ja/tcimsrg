@@ -269,6 +269,16 @@ public:
         exit(1);
     }
 
+    double flow_0b(vector<double> &f, vector<double> &Gamma, 
+                   vector<double> &eta1b, vector<double> &eta2b,
+                   vector<double> &rho1b, vector<double> &rho2b, vector<double> &rho3b,
+                   vector<double> &dGamma) {
+
+        std::cout << "MULTI-REFERENCE UNIMPLEMENTED FOR THIS BACKEND, EXITING..." << std::endl;
+        exit(1);
+    }
+
+
     vector<double> flow_1b(vector<double> &f, vector<double> &Gamma, 
                            vector<double> &eta1b, vector<double> &eta2b,
                            vector<double> &rho1b, vector<double> &rho2b) {

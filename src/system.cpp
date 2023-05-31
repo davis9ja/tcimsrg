@@ -6,7 +6,7 @@ using namespace boost::numeric::ublas;
 
 System::System(){}
 
-System::System(int numStates, vector<double> &rho1b, vector<double> &rho2b,
+System::System(int numStates, vector<double> &rho1b, vector<double> &rho2b, vector<double> &rho3b,
                double &E, vector<double> &f, vector<double> &Gamma, vector<double> &W,
                Generator *generator, Flow_IMSRG2 *flow, 
                std::ofstream *out_file_vac_in, std::ofstream *out_file_imsrg_in,
@@ -18,6 +18,7 @@ System::System(int numStates, vector<double> &rho1b, vector<double> &rho2b,
     this->numStates = numStates;
     this->rho1b = rho1b;
     this->rho2b = rho2b;
+    this->rho3b = rho3b;
     this->E = E;
     this->f = f;
     this->Gamma = Gamma;
@@ -27,6 +28,8 @@ System::System(int numStates, vector<double> &rho1b, vector<double> &rho2b,
     out_file_vac = out_file_vac_in;
     out_file_imsrg = out_file_imsrg_in;
     this->reference_type = reference_type;
+
+    std::cout << "THIS REFERENCE TYPE IS " << this->reference_type << std::endl;
 }
 
 // System::~System() {
@@ -171,7 +174,7 @@ void System::operator() (const state_type &x, state_type &dxdt, const double t) 
     case 1:        
         dGamma = (*flow).flow_2b(f, Gamma, eta1b, eta2b, rho1b, rho2b);
         df = (*flow).flow_1b(f, Gamma, eta1b, eta2b, rho1b, rho2b);
-        dE = (*flow).flow_0b(f, Gamma, eta1b, eta2b, rho1b, rho2b, dGamma);
+        dE = (*flow).flow_0b(f, Gamma, eta1b, eta2b, rho1b, rho2b, rho3b, dGamma);
         break;
     default:
         dE = (*flow).flow_0b(f, Gamma, eta1b, eta2b);
@@ -179,6 +182,11 @@ void System::operator() (const state_type &x, state_type &dxdt, const double t) 
         dGamma = (*flow).flow_2b(f, Gamma, eta1b, eta2b);
         
     }
+
+    // dE = (*flow).flow_0b(f, Gamma, eta1b, eta2b);
+    // df = (*flow).flow_1b(f, Gamma, eta1b, eta2b);
+    // dGamma = (*flow).flow_2b(f, Gamma, eta1b, eta2b);
+
     // Set derivative
     system2vector(dE, df, dGamma, dxdt);
 

@@ -236,6 +236,7 @@ public:
 
     //******* MULTI-REFERENCE FLOW EQUATIONS
 
+    //** up to 2B density
     double flow_0b(vector<double> &f, vector<double> &Gamma, 
                    vector<double> &eta1b, vector<double> &eta2b,
                    vector<double> &rho1b, vector<double> &rho2b, vector<double> &dGamma) {
@@ -294,6 +295,72 @@ public:
 
     }
 
+    //** up to 3B density
+    double flow_0b(vector<double> &f, vector<double> &Gamma, 
+                   vector<double> &eta1b, vector<double> &eta2b,
+                   vector<double> &rho1b, vector<double> &rho2b, vector<double> &rho3b,
+                   vector<double> &dGamma) {
+
+        int numStates = (int)sqrt(f.size());
+        std::vector<int> shape_r2 = {numStates,numStates};
+        std::vector<int> shape_r3 = {numStates,numStates,numStates};
+        std::vector<int> shape_r4 = {numStates,numStates,numStates,numStates};
+        std::vector<int> shape_r6 = {numStates,numStates,numStates,numStates,numStates,numStates};
+        Format format_r2({Dense,Dense});
+        Format format_r3({Dense,Dense,Dense});
+        Format format_r4({Dense,Dense,Dense,Dense});
+        Format format_r6({Dense,Dense,Dense,Dense,Dense,Dense});
+
+        double dE;
+        Tensor<double> sum1_0b("sum1_0b"), sum2_0b1("sum2_0b1"), sum2_0b2("sum2_0b2"), sum3_0b("sum3_0b"), sum4_0b1("sum4_0b1"), sum4_0b2("sum4_0b2"), dE_t("dE");
+
+        Tensor<double> 
+            f_t("f_t", shape_r2, format_r2),
+            Gamma_t("Gamma_t", shape_r4, format_r4),
+            dGamma_t("dGamma_t", shape_r4, format_r4),
+            eta1b_t("eta1b_t", shape_r2, format_r2),
+            eta2b_t("eta2b_t", shape_r4, format_r4),
+            rho1b_t("rho1b_t", shape_r2, format_r2),
+            rho2b_t("rho2b_t", shape_r4, format_r4),
+            rho3b_t("rho3b_t", shape_r6, format_r6);        
+        
+        f_t.pack();
+        Gamma_t.pack();
+        dGamma_t.pack();
+        eta1b_t.pack();
+        eta2b_t.pack();
+        rho1b_t.pack();
+        rho2b_t.pack();
+        rho3b_t.pack();
+
+        vector2tensor(f, f_t);
+        vector2tensor(Gamma, Gamma_t);
+        vector2tensor(dGamma, dGamma_t);
+        vector2tensor(eta1b, eta1b_t);
+        vector2tensor(eta2b, eta2b_t);
+        vector2tensor(rho1b, rho1b_t);
+        vector2tensor(rho2b, rho2b_t);
+        vector2tensor(rho3b, rho3b_t);
+
+        IndexVar a,b,c,d,k,l,m,p,q;    
+        sum1_0b() = occA_a(a,p)*occA_b(p,b)*eta1b_t(a,b)*f_t(a,b);
+        sum2_0b1() = occD_a(a,p)*occD_b(p,b)*occD_c(c,q)*occD_d(q,d)*eta2b_t(a,b,c,d)*Gamma_t(c,d,a,b);
+        sum2_0b2() = occD_a(a,p)*occD_b(p,b)*occD_c(c,q)*occD_d(q,d)*Gamma_t(a,b,c,d)*eta2b_t(c,d,a,b);
+        sum3_0b() = dGamma_t(a,b,c,d)*rho2b_t(a,b,c,d);
+        sum4_0b1() = eta2b_t(a,b,c,d)*Gamma_t(k,l,a,m)*rho3b_t(b,k,l,c,d,m);
+        sum4_0b2() = Gamma_t(a,b,c,d)*eta2b_t(k,l,a,m)*rho3b_t(b,k,l,c,d,m);
+
+        dE_t() = sum1_0b() + 0.25*(sum2_0b1() - sum2_0b2()) + 0.25*sum3_0b() + 0.25*(sum4_0b1() - sum4_0b2());
+
+        dE_t.evaluate();
+    
+        dE = static_cast<const double*>(dE_t.getStorage().getValues().getData())[0];
+
+        return dE;
+
+    }
+
+    //**  up to 2B density
     vector<double> flow_1b(vector<double> &f, vector<double> &Gamma, 
                            vector<double> &eta1b, vector<double> &eta2b,
                            vector<double> &rho1b, vector<double> &rho2b) {
@@ -378,6 +445,7 @@ public:
 
     }
 
+    //** up to 2B density
     vector<double> flow_2b(vector<double> &f, vector<double> &Gamma, 
                            vector<double> &eta1b, vector<double> &eta2b,
                            vector<double> &rho1b, vector<double> &rho2b) {

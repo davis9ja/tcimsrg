@@ -196,6 +196,20 @@ void write_log(std::ofstream *out_file_imsrg, std::vector<state_type> data_log) 
 
 }
 
+void write_rho(std::ofstream *out_file_rho, boost::numeric::ublas::vector<double> rho) {
+    if((*out_file_rho).is_open()) {
+
+        for (int i = 0; i < rho.size(); i++) {
+            double x = rho[i];
+            *out_file_rho << x;
+            *out_file_rho << std::fixed << std::setprecision(13) << "\n";
+        }
+    } else {
+        std::cout << "rho log file not created for some reason" << std::endl;
+    }
+}
+
+
 int main(int argc, char **argv) {
     omp_set_num_threads(4);
 
@@ -242,13 +256,17 @@ int main(int argc, char **argv) {
     matrix<int> basis;
     std::ifstream in_file;
     vector<double> weights;
-    vector<double> rho1b, rho2b;
+    vector<double> rho1b, rho2b, rho3b, lambda2b, lambda3b;
     vector<double> currentVec;
 
     // for logging
     std::string log_dir;
     std::ofstream out_file_vac;
     std::ofstream out_file_imsrg;
+
+    std::string rho_dir;
+    std::ofstream out_file_rho1b;
+    std::ofstream out_file_rho2b;
 
     // for DMD
     DMD dmd;
@@ -295,25 +313,62 @@ int main(int argc, char **argv) {
             token = line.substr(0, pos);
             line.erase(0, pos + delim.length());
             numWeights = std::stoi(line);
-
+        } else {
+            std::cout << "Failure to read basis file at " << basis_path << " exiting..." << std::endl;
+            exit(1);
         }
         
         weights = vector<double>(numWeights);
+
+        if (in_file.good()) {
+
+            for (int i = 0; i < numWeights; i++) {
+                size_t pos = 0;
+                std::string line;
+                std::getline(in_file, line);
+
+                std::string delim = ",";
+                std::string w;
+
+                pos = line.find(delim);
+                w = line.substr(0, pos);            
+                //line.erase(0, pos + delim.length());
+                weights[i] = std::stof(w);
+            }
+
+        } else {
+            std::cout << "Failure to read basis file at " << basis_path << " exiting..." << std::endl;
+            exit(1);
+        }
+
         // weights[0] = sqrt(0.8);
         // weights[1] = sqrt(0.2);
-        for (int i = 0; i < numWeights; i++) {
-            if (i == 0)
-                weights[i] = (0.8);
-            else if (i == 1)
-                weights[i] = (0.2);
-            else
-                weights[i] = 0.0;
-        }
+        // for (int i = 0; i < numWeights; i++) {
+        //     if (i == 0)
+        //         weights[i] = (0.6);
+        //     else if (i == 1)
+        //         weights[i] = (0.1);
+        //     else if (i == 2)
+        //         weights[i] = (0.1);
+        //     else if (i == 3)
+        //         weights[i] = (0.1);
+        //     else if (i == 4) 
+        //         weights[i] = (0.1);                 
+        //     else
+        //         weights[i] = 0.0;
+        // }
     
         std::cout << "Generating 1b/2b density matrices from SD basis..." << std::endl;
 
-        rho1b = density_1b((int)numStates/2,(int)numStates/2, weights, 14, basis_path);
-        rho2b = density_2b((int)numStates/2,(int)numStates/2, weights, 14, basis_path);
+        // need to change arguments here; should be nholes, nparticles; make sure we can generate basis without half-filling restriction
+        // rho1b = density_1b((int)numStates/2,(int)numStates/2, weights, 14, basis_path);
+        // rho2b = density_2b((int)numStates/2,(int)numStates/2, weights, 14, basis_path);
+
+        rho1b = density_1b(nHoles, nParticles, weights, 14, basis_path);
+        rho2b = density_2b(nHoles, nParticles, weights, 14, basis_path);
+        rho3b = density_3b(nHoles, nParticles, weights, 14, basis_path);
+        lambda2b = density_2b_irr(nHoles+nParticles, rho1b, rho2b, 14);
+        lambda3b = density_3b_irr(nHoles+nParticles, rho1b, lambda2b, rho3b, 14);
 
         //int numStates = nholes + nparticles;
         for (int i = 0; i < numWeights; i++) {
@@ -397,15 +452,33 @@ int main(int argc, char **argv) {
     Gamma = H.get_Gamma();
     //W;
 
-    log_dir = "./flow/";
-    const char* path_char = &log_dir[0];
+    // Make the rho directory and write the rhos to files
+    // Make the rho log directory
+    rho_dir = "./rho/";
+    const char* path_char = &rho_dir[0];
     int check = mkdir(path_char, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+
+    if (check == -1) {
+        std::cout << "Rho dir already exists at ./rho/" << std::endl;
+    }
+
+    boost::format rho_suffix = boost::format("%02d.out")%numStates;
+    out_file_rho1b = std::ofstream(rho_dir+"rho1b_"+rho_suffix.str());
+    out_file_rho2b = std::ofstream(rho_dir+"rho2b_"+rho_suffix.str());
+    write_rho(&out_file_rho1b, rho1b);
+    write_rho(&out_file_rho2b, rho2b);
+
+
+    // Make the flow log directory and set up flow logging files
+    log_dir = "./flow/";
+    path_char = &log_dir[0];
+    check = mkdir(path_char, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
     if (check == -1) {
         std::cout << "Log dir already exists at ./flow/" << std::endl;
     }
 
-    std::string log_path = "./flow/H";
+    std::string log_path = log_dir+"H";
     if (reference_type == 0)
         log_path += "S";
     else if (reference_type == 1)
@@ -447,7 +520,7 @@ int main(int argc, char **argv) {
     out_file_imsrg << "#dt," << dt << std::endl;
 
 
-    sys = System(numStates, rho1b, rho2b, E, f, Gamma, W, generator, &flow, &out_file_vac, &out_file_imsrg, reference_type);
+    sys = System(numStates, rho1b, lambda2b, lambda3b, E, f, Gamma, W, generator, &flow, &out_file_vac, &out_file_imsrg, reference_type);
     y0 = state_type(1+f.size()+Gamma.size());
 
     sys.system2vector(E, f, Gamma, y0);
@@ -504,8 +577,8 @@ int main(int argc, char **argv) {
         compute_dmd(&dmd, dmdData, nColumns, nRows, dmdTrunc);
 
         // set background
-        //dmd.eig[0] = 1.0;
-        for (int i = 0; i < dmdTrunc; i++) {
+        dmd.eig[0] = 1.0;
+        for (int i = 1; i < dmdTrunc; i++) {
             if (dmd.eig[i] > 1 || dmd.eig[i] < 0) {
                 printf("%6.8f [%d], ", dmd.eig[i], i);
                 dmd.eig[i] = 1.;
@@ -566,7 +639,10 @@ int main(int argc, char **argv) {
     out_file_vac.close();
     out_file_imsrg.close();    
 
-    std::system(("gzip " + log_path).c_str());
+    out_file_rho1b.close();
+    out_file_rho2b.close();
+
+    std::system(("gzip -f " + log_path).c_str());
     std::remove((log_path).c_str());
     
     //std::cout << sys.getFlowData() << std::endl;

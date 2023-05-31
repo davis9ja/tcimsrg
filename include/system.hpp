@@ -28,7 +28,7 @@ private:
     std::vector<state_type> data_log;
     std::ofstream *out_file_vac, *out_file_imsrg;
 
-    boost::numeric::ublas::vector<double> rho1b, rho2b;
+    boost::numeric::ublas::vector<double> rho1b, rho2b, rho3b;
     boost::numeric::ublas::vector<int> holes, particles;
     //SystemObserver *observer;
     
@@ -48,7 +48,7 @@ public:
     double getEta2bNorm() { return eta2b_norm; }
 
     System();
-    System(int numStates, boost::numeric::ublas::vector<double> &rho1b, boost::numeric::ublas::vector<double> &rho2b,
+    System(int numStates, boost::numeric::ublas::vector<double> &rho1b, boost::numeric::ublas::vector<double> &rho2b, boost::numeric::ublas::vector<double> &rho3b,
            double &E, boost::numeric::ublas::vector<double> &f, boost::numeric::ublas::vector<double> &Gamma, boost::numeric::ublas::vector<double> &W,
            Generator *generator, 
            Flow_IMSRG2 *flow,
