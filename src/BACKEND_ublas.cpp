@@ -22,7 +22,7 @@ private:
         return i*numStates*numStates*numStates + j*numStates*numStates + k*numStates + l;
     }
 
-    vector<double> occA, occB, occC, occC2, occD;
+    vector<double> occA, occB, occC, occC2, occD, occD2;
 
 public:
     using Backend::flow_0b;
@@ -41,8 +41,9 @@ public:
         this->occC = vector<double>(numStates*numStates*numStates);        
         this->occC2 = vector<double>(numStates*numStates*numStates);        
         this->occD = vector<double>(numStates*numStates*numStates*numStates);        
+        this->occD2 = vector<double>(numStates*numStates*numStates*numStates);        
         
-        (*occFact).contractOccTensors(path, this->occA, this->occB, this->occC, this->occC2, this->occD);
+        (*occFact).contractOccTensors(path, this->occA, this->occB, this->occC, this->occC2, this->occD, this->occD2);
         
     }
 

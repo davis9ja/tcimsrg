@@ -21,7 +21,9 @@ private:
         occB_a, occB_b,
         occC_a, occC_b, occC_c,
         occC2_a, occC2_b, occC2_c,
-        occD_a, occD_b, occD_c, occD_d;
+        occD_a, occD_b, occD_c, occD_d,
+        occD2_a, occD2_b, occD2_c, occD2_d;
+
 
 public:
     Brillouin() {}
@@ -40,7 +42,8 @@ public:
                                 occB_a, occB_b,
                                 occC_a, occC_b, occC_c,
                                 occC2_a, occC2_b, occC2_c,
-                                occD_a, occD_b, occD_c, occD_d);
+                                occD_a, occD_b, occD_c, occD_d,
+                                occD2_a, occD2_b, occD2_c, occD2_d);
 
 
     }
@@ -84,13 +87,13 @@ public:
         sum2_1b(i,j) = Gamma_t(j,a,b,c)*rho2b_t(i,a,b,c) - Gamma_t(a,b,i,c)*rho2b_t(a,b,j,c);
 
         
-        eta1b_t(i,j) = term1_1b(i,j) - 0.5*sum2_1b(i,j);
+        eta1b_t(i,j) = term1_1b(i,j); //- 0.5*sum2_1b(i,j);
         
         eta1b_t.evaluate();
         
-        tensor2vector(eta1b_t, eta1b);
+        tensor2vector(eta1b_t, eta1b_arr);
 
-        return eta1b;
+        return eta1b_arr;
 
 
     }
@@ -125,12 +128,12 @@ public:
             f_t("f_t", shape_r2, format_r2),
             Gamma_t("Gamma_t", shape_r4, format_r4),
             eta2b_t("eta2b_t", shape_r4, format_r4),
-            rho2b_t("rho2b_t", shape_r4, format_r4);
+            rho2b_t("rho2b_t", shape_r4, format_r4),
             rho3b_t("rho3b_t", shape_r6, format_r6);        
 
         f_t.pack();
         Gamma_t.pack();
-        eta1b_t.pack();
+        eta2b_t.pack();
         rho2b_t.pack();
         rho3b_t.pack();
 
@@ -159,18 +162,24 @@ public:
             Gamma_t(k,a,b,c)*rho3b_t(a,i,j,b,c,l) - Gamma_t(l,a,b,c)*rho3b_t(a,i,j,b,c,k) - \
             Gamma_t(a,b,i,c)*rho3b_t(a,b,j,c,k,l) + Gamma_t(a,b,j,c)*rho3b_t(a,b,i,c,k,l);
 
-        eta2b_t(i,j,k,l) = term1_2b(i,j,k,l) + sum2_2b(i,j,k,l) + 0.5*sum3_2b(i,j,k,l) + sum4_2b(i,j,k,l) + 0.5*sum5_2b(i,j,k,l);
+        eta2b_t(i,j,k,l) = sum2_2b(i,j,k,l); + 0.5*sum3_2b(i,j,k,l) + sum4_2b(i,j,k,l) + 0.5*sum5_2b(i,j,k,l);
+            // +                                       \
+              //+ ; //+ ; //+ ;
 
         eta2b_t.evaluate();
 
-        tensor2vector(eta2b_t, eta2b);
+        tensor2vector(eta2b_t, eta2b_arr);
 
-        return eta2b;
+        return eta2b_arr;
 
 
     }
 
+    vector<double> compute_3b(vector<double> &f, vector<double> &Gamma, vector<double> &W) {
+    
+        return W;
+    }
 
 
 
-}
+};

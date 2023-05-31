@@ -33,7 +33,7 @@ OccupationFactors::OccupationFactors(int numStates, int refType, vector<double> 
     writeC();
     writeC2();
     writeD();
-    WriteD2();
+    writeD2();
 }
 
 std::string OccupationFactors::getPath() {
@@ -129,7 +129,7 @@ void OccupationFactors::contractOccTensors(std::string factor_path,
     occC_t(a,b,c) = occC_a(a,p)*occC_b(p,b,q)*occC_c(q,c);
     occC2_t(a,b,c) = occC2_b(a,p)*occC2_c(p,b,q)*occC2_a(q,c);
     occD_t(a,b,c,d) = occD_a(a,p)*occD_b(p,b)*occD_c(c,q)*occD_d(q,d);
-    occD2_t(a,b,c,d) = occD_a(a,p)*occD_b(p,b,q)*occD_c(q,c,r)*occD_d(r,d);
+    occD2_t(a,b,c,d) = occD2_a(a,p)*occD2_b(p,b,q)*occD2_c(q,c,r)*occD2_d(r,d);
 
     occA_t.evaluate();
     occB_t.evaluate();
@@ -333,9 +333,9 @@ void OccupationFactors::writeD2() {
     for (int a = 0; a < numStates; a++) {
         double val = ref[a];
 
-        occD2_a.insert({a,0}, 1);
+        occD2_a.insert({a,0}, 1.0);
         occD2_a.insert({a,1}, -val);
-        occD2_a.insert({a,2}, 1);
+        occD2_a.insert({a,2}, 1.0);
         occD2_a.insert({a,3}, -val);
         occD2_a.insert({a,4}, val);
         occD2_a.insert({a,5}, val);
@@ -350,15 +350,15 @@ void OccupationFactors::writeD2() {
         occD2_c.insert({0,a,0}, val);
         occD2_c.insert({1,a,1}, val);
         occD2_c.insert({2,a,2}, val);
-        occD2_c.insert({3,a,3}, 1);
+        occD2_c.insert({3,a,3}, 1.0);
         occD2_c.insert({4,a,4}, val);
-        occD2_c.insert({5,a,5}, 1);
+        occD2_c.insert({5,a,5}, 1.0);
 
         occD2_d.insert({0,a}, val);
         occD2_d.insert({1,a}, val);
         occD2_d.insert({2,a}, val);
-        occD2_d.insert({3,a}, 1);
-        occD2_d.insert({4,a}, 1);
+        occD2_d.insert({3,a}, 1.0);
+        occD2_d.insert({4,a}, 1.0);
         occD2_d.insert({5,a}, val);
     }
 

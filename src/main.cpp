@@ -19,6 +19,7 @@
 
 #include "white.cpp"
 #include "white_atan.cpp"
+#include "brillouin.cpp"
 #include "BACKEND_ublas.cpp"
 #include "BACKEND_taco.cpp"
 #include "DMD.c"
@@ -121,6 +122,8 @@ void process_user_input(int argc, char **argv,
         std::cout << "White\n";
     } else if (generator_id == 1) {
         std::cout << "White (atan)\n";
+    } else if (generator_id == 2) {
+        std::cout << "Brillouin (MR)\n";
     } else {
         std::cout << "GENERATOR INPUT NOT RECOGNIZED. EXITING...";
         exit(1);
@@ -237,6 +240,7 @@ int main(int argc, char **argv) {
     Generator *generator;
     White white;
     WhiteAtan whiteAtan;
+    Brillouin brillouin;
 
     PairingHamiltonian H;
     Flow_IMSRG2 flow;
@@ -422,6 +426,7 @@ int main(int argc, char **argv) {
 
     white = White(numStates, ref);
     whiteAtan = WhiteAtan(numStates, ref);
+    brillouin = Brillouin(numStates, ref, rho1b, lambda2b, lambda3b, &occ);
 
     switch (generator_id) {
     case 0:
@@ -429,6 +434,9 @@ int main(int argc, char **argv) {
         break;
     case 1:
         generator = &whiteAtan;
+        break;
+    case 2:
+        generator = &brillouin; 
         break;
     default:
         generator = &white;

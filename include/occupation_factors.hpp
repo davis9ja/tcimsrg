@@ -42,7 +42,7 @@ public:
                         taco::Tensor<double> &occB_a, taco::Tensor<double> &occB_b,
                         taco::Tensor<double> &occC_a, taco::Tensor<double> &occC_b, taco::Tensor<double> &occC_c,
                         taco::Tensor<double> &occC2_a, taco::Tensor<double> &occC2_b, taco::Tensor<double> &occC2_c,
-                        taco::Tensor<double> &occD_a, taco::Tensor<double> &occD_b, taco::Tensor<double> &occD_c, taco::Tensor<double> &occD_d
+                        taco::Tensor<double> &occD_a, taco::Tensor<double> &occD_b, taco::Tensor<double> &occD_c, taco::Tensor<double> &occD_d,
                         taco::Tensor<double> &occD2_a, taco::Tensor<double> &occD2_b, taco::Tensor<double> &occD2_c, taco::Tensor<double> &occD2_d);
 
     void contractOccTensors(std::string factor_path,

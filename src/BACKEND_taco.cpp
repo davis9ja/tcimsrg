@@ -17,7 +17,9 @@ private:
         occB_a, occB_b,
         occC_a, occC_b, occC_c,
         occC2_a, occC2_b, occC2_c,
-        occD_a, occD_b, occD_c, occD_d;
+        occD_a, occD_b, occD_c, occD_d,
+        occD2_a, occD2_b, occD2_c, occD2_d;
+
     
     // void vector2tensor(vector<double> &input, Tensor<double> &output) {
     //     double* output_arr = (double*)output.getStorage().getValues().getData();
@@ -48,7 +50,8 @@ public:
                                 occB_a, occB_b,
                                 occC_a, occC_b, occC_c,
                                 occC2_a, occC2_b, occC2_c,
-                                occD_a, occD_b, occD_c, occD_d);
+                                occD_a, occD_b, occD_c, occD_d,
+                                occD2_a, occD2_b, occD2_c, occD2_d);
     }
     
     //*********** SINGLE REFERENCE FLOW EQUATIONS
